@@ -1,94 +1,93 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-int is_max_in_column(int index, int column_number, int** matrix, int str_count)
-{
-	for (int i = 0; i < str_count; i++)
-	{
-		if (matrix[i][column_number] > matrix[index][column_number])
-		{
-			return 0;
-		}
-	}
-
-	return 1;
-}
-
-int find_max_in_column(int** matrix, int column, int strings_count)
+int find_max_in_column(int** matrix, int column, int rows_count)
 {
 	int current_max = matrix[0][column];
 
-	for (int i = 1; i < strings_count; i++)
+	for (int i = 1; i < rows_count; i++)
 	{
-		if (matrix[i][column] > current_max) current_max = matrix[i][column];
+		if (matrix[i][column] > current_max)
+		{
+			current_max = matrix[i][column];
+		}
 	}
 
 	return current_max;
 }
 
-int find_min_in_str(int* str, int size)
+int find_min_in_row(int** matrix, int row, int columns_count)
 {
-	int current_min = str[0];
+	int current_min = matrix[row][0];
 
-	for (int i = 1; i < size; i++)
+	for (int i = 1; i < columns_count; i++)
 	{
-		if (str[i] < current_min) current_min = str[i];
+		if (matrix[row][i] < current_min)
+		{
+			current_min = matrix[row][i];
+		}
 	}
 
 	return current_min;
 }
 
-int average_in_column(int** matrix, int column, int str_count)
+int average_in_column(int** matrix, int column, int rows_count)
 {
 	int sum = 0;
 
-	for (int i = 0; i < str_count; i++)
+	for (int i = 0; i < rows_count; i++)
+	{
 		sum += matrix[i][column];
+	}
 
-	return sum / str_count;
+	return sum / rows_count;
 }
 
-int count_points(int strings_count, int columns_count, int** matrix)
+int count_points(int rows_count, int columns_count, int** matrix)
 {
 	int min_in_str;
 	int points_count = 0;
 
-	int* min_elements_in_strings = (int*)malloc(strings_count * sizeof(int));
+	int* min_elements_in_rows = (int*)malloc(rows_count * sizeof(int));
 	int* max_elements_in_columns = (int*)malloc(columns_count * sizeof(int));
 
-	if (!min_elements_in_strings || !max_elements_in_columns)
+	if (!min_elements_in_rows || !max_elements_in_columns)
 	{
 		printf("Can't allocate memory for arrays in count_points\n");
 		return -1;
 	}
 
-	for (int i = 0; i < strings_count; i++)
-		min_elements_in_strings[i] = find_min_in_str(matrix[i], columns_count);
-
-	for(int i = 0; i < columns_count; i++)
-		max_elements_in_columns[i] = find_max_in_column(matrix, i, strings_count);
-
-	for (int i = 0; i < strings_count; i++)
+	for (int i = 0; i < rows_count; i++)
 	{
-		for(int j = 0; j < columns_count; j++)
+		min_elements_in_rows[i] = find_min_in_row(matrix, i, columns_count);
+	}
+
+	for (int i = 0; i < columns_count; i++)
+	{
+		max_elements_in_columns[i] = find_max_in_column(matrix, i, rows_count);
+	}
+
+	for (int i = 0; i < rows_count; i++)
+	{
+		for (int j = 0; j < columns_count; j++)
 		{
-			if (matrix[i][j] == min_elements_in_strings[i] && matrix[i][j] == max_elements_in_columns[j])
+			if (matrix[i][j] == min_elements_in_rows[i] && matrix[i][j] == max_elements_in_columns[j])
 			{
-				matrix[i][j] = average_in_column(matrix, j, strings_count);
+				matrix[i][j] = average_in_column(matrix, j, rows_count);
 				points_count++;
 			}
 		}
 	}
 
-	free(min_elements_in_strings);
+	free(min_elements_in_rows);
 	free(max_elements_in_columns);
 
 	return points_count;
 }
 
-int** allocate_matrix(int strings_count, int columns_count)
+int** allocate_matrix(int rows_count, int columns_count)
 {
-	int** matrix = (int**)malloc(strings_count * sizeof(int*));
+	int** matrix = (int**)malloc(rows_count * sizeof(int*));
 
 	if (!matrix)
 	{
@@ -96,7 +95,7 @@ int** allocate_matrix(int strings_count, int columns_count)
 		return NULL;
 	}
 
-	for (int i = 0; i < strings_count; i++)
+	for (int i = 0; i < rows_count; i++)
 	{
 		matrix[i] = (int*)malloc(columns_count * sizeof(int));
 
@@ -113,16 +112,18 @@ int** allocate_matrix(int strings_count, int columns_count)
 void free_matrix(int** matrix, int size)
 {
 	for (int i = 0; i < size; i++)
+	{
 		free(matrix[i]);
+	}
 
 	free(matrix);
 }
 
-void print_matrix(FILE* file, int** matrix, int strings_count, int columns_count)
+void print_matrix(FILE* file, int** matrix, int rows_count, int columns_count)
 {
-	for (int i = 0; i < strings_count; i++)
+	for (int i = 0; i < rows_count; i++)
 	{
-		for(int j = 0; j < columns_count; j++)
+		for (int j = 0; j < columns_count; j++)
 		{
 			fprintf(file, "%d ", matrix[i][j]);
 		}
@@ -133,7 +134,7 @@ void print_matrix(FILE* file, int** matrix, int strings_count, int columns_count
 
 int main()
 {
-	short columns_count, strings_count;
+	short columns_count, rows_count;
 	int points_count = 0;
 
 	FILE *input, *output;
@@ -145,18 +146,22 @@ int main()
 		return 1;
 	}
 
-	fscanf(input, "%hi %hi", &columns_count, &strings_count);
+	fscanf(input, "%hi %hi", &columns_count, &rows_count);
 
-	int** matrix = allocate_matrix(strings_count, columns_count);
+	int** matrix = allocate_matrix(rows_count, columns_count);
 
 	if (!matrix)
+	{
 		return 1;
+	}
 
-	for (int i = 0; i < strings_count; i++)
+	for (int i = 0; i < rows_count; i++)
+	{
 		for (int j = 0; j < columns_count; j++)
 		{
 			fscanf(input, "%d", &matrix[i][j]);
 		}
+	}
 
 	fclose(input);
 
@@ -167,17 +172,18 @@ int main()
 		return 1;
 	}
 
-	points_count = count_points(strings_count, columns_count, matrix);
+	points_count = count_points(rows_count, columns_count, matrix);
+
 	if (points_count == -1)
 	{
 		return -1;
 	}
 
 	fprintf(output, "%d\n", points_count);
-	print_matrix(output, matrix, strings_count, columns_count);
+	print_matrix(output, matrix, rows_count, columns_count);
 	fclose(output);
 
-	free_matrix(matrix, strings_count);
+	free_matrix(matrix, rows_count);
 
 	return 0;
 }
