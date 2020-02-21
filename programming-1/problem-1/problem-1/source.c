@@ -48,8 +48,8 @@ int count_points(int rows_count, int columns_count, int** matrix)
 	int min_in_str;
 	int points_count = 0;
 
-	int* min_elements_in_rows = (int*)malloc(rows_count * sizeof(int));
-	int* max_elements_in_columns = (int*)malloc(columns_count * sizeof(int));
+	int* min_elements_in_rows = (int*)calloc(rows_count * sizeof(int));
+	int* max_elements_in_columns = (int*)calloc(columns_count * sizeof(int));
 
 	if (!min_elements_in_rows || !max_elements_in_columns)
 	{
@@ -85,9 +85,26 @@ int count_points(int rows_count, int columns_count, int** matrix)
 	return points_count;
 }
 
+void free_matrix(int** matrix, int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		if (matrix[i])
+		{
+			free(matrix[i]);
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	free(matrix);
+}
+
 int** allocate_matrix(int rows_count, int columns_count)
 {
-	int** matrix = (int**)malloc(rows_count * sizeof(int*));
+	int** matrix = (int**)calloc(rows_count * sizeof(int*));
 
 	if (!matrix)
 	{
@@ -97,26 +114,17 @@ int** allocate_matrix(int rows_count, int columns_count)
 
 	for (int i = 0; i < rows_count; i++)
 	{
-		matrix[i] = (int*)malloc(columns_count * sizeof(int));
+		matrix[i] = (int*)calloc(columns_count * sizeof(int));
 
 		if (!matrix[i])
 		{
 			printf("Can't allocate memory for matrix");
+			free_matrix(matrix, rows_count);
 			return NULL;
 		}
 	}
 
 	return matrix;
-}
-
-void free_matrix(int** matrix, int size)
-{
-	for (int i = 0; i < size; i++)
-	{
-		free(matrix[i]);
-	}
-
-	free(matrix);
 }
 
 void print_matrix(FILE* file, int** matrix, int rows_count, int columns_count)
