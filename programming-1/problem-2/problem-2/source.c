@@ -57,81 +57,89 @@ char** allocate_words(int number)
 	return words;
 }
 
-void print_words(char** words, int number)
-{
-	for (int i = 0; i < number; i++)
-	{
-		printf("%s\n", words[i]);
-	}
-}
+//void print_words(char** words, int number)
+//{
+//	for (int i = 0; i < number; i++)
+//	{
+//		printf("%s\n", words[i]);
+//	}
+//}
 
-int substr_count(char* str, char* substr)
-{
-	char* tmp = strstr(str, substr);
-	int count = 0;
+//int substr_count(char* str, char* substr)
+//{
+//	char* tmp = strstr(str, substr);
+//	int count = 0;
+//
+//	while (tmp)
+//	{
+//		tmp = strstr(tmp + 1, substr);
+//		count++;
+//	}
+//
+//	return count;
+//}
 
-	while (tmp)
-	{
-		tmp = strstr(tmp + 1, substr);
-		count++;
-	}
-
-	return count;
-}
-
-int extract_iterations(char* begin, char* end)
+int extract_iterations(char* exp_start, char* exp_end)
 {
 	int iterations = 0;
 
-	while (begin != end)
+	while (exp_start != exp_end)
 	{
 		iterations *= 10;
-		iterations += *begin - '0';
-		begin++;
+		iterations += *exp_start - '0';
+		exp_start++;
 	}
 
 	return iterations;
 }
 
-int count_pattern_length(char* start, char* end)
+char* go_while_bracket_sequence_is_invalid(char *start, char start_bracket, char end_bracket)
+{
+	int brackets_count = 1;
+	char* reader = start;
+
+	while (brackets_count)
+	{
+		if (*reader == start_bracket)
+		{
+			brackets_count++;
+		}
+		else if (*reader == end_bracket)
+		{
+			brackets_count--;
+		}
+		reader++;
+	}
+
+	return reader;
+}
+
+int count_pattern_length(char* pattern_start, char* pattern_end)
 {
 	int length = 0;
-	int brackets_count;
+	char *reader = pattern_start;
 
-	while (start != end)
+	while (reader != pattern_end)
 	{
-		if (*start == '[')
+		if (*reader == '[')
 		{
-			length += extract_iterations(start + 1, strstr(start, "*")) * count_pattern_length(strstr(start, "("), strstr(start, ")"));
-			brackets_count = 1;
-			start++;
+			length += extract_iterations(reader + 1, strstr(reader, "*")) * count_pattern_length(strstr(reader, "("), strstr(reader, ")"));
+			reader++;
 
-			while (brackets_count)
-			{
-				if (*start == '[')
-				{
-					brackets_count++;
-				}
-				else if (*start == ']')
-				{
-					brackets_count--;
-				}
-				start++;
-			}
-
+			reader = go_while_bracket_sequence_is_invalid(reader, '[', ']');
 			continue;
 		}
 
-		if (*start != '\\' && *start != '(' && *start != '~' && *start != ')')
+		if (*reader != '\\' && *reader != '(' && *reader != '~' && *reader != ')')
 		{
 			length++;
 		}
-		start++;
+
+		reader++;
 	}
 
 	return length;
 }
-
 
 int match(char* word_start, char* word_end, char* pattern_start, char* pattern_end)
 {
@@ -140,36 +148,37 @@ int match(char* word_start, char* word_end, char* pattern_start, char* pattern_e
 		return 0;
 	}
 
-	char* tmp_word = word_start, *tmp_pattern = pattern_start;
+	char* word_reader = word_start, *pattern_reader = pattern_start, *subpattern_start, *subpattern_end;
 	int iterations, pattern_length, brackets_count;
 
-	while (tmp_word != word_end && tmp_pattern != pattern_end)
+	while (word_reader != word_end && pattern_reader != pattern_end)
 	{
-		if (*tmp_pattern != '[' && *tmp_pattern != '~' && *tmp_pattern != '\\')
+		if (*pattern_reader != '[' && *pattern_reader != '~' && *pattern_reader != '\\')
 		{
-			if (*tmp_pattern != *tmp_word)
+			if (*pattern_reader != *word_reader)
 			{
 				return 0;
 			}
-			tmp_pattern++;
-			tmp_word++;
+
+			pattern_reader++;
+			word_reader++;
 		}
 		else
 		{
-			switch (*tmp_pattern)
+			switch (*pattern_reader)
 			{
 			case '\\':
-				switch (*(tmp_pattern + 1))
+				switch (*(pattern_reader + 1))
 				{
-				case 'd': 
-					if (!isdigit(*tmp_word))
+				case 'd':
+					if (!isdigit(*word_reader))
 					{
 						return 0;
 					}
 					break;
 
 				case 'D':
-					if (!((*tmp_word >= 'a' && *tmp_word <= 'z') || (*tmp_word >= 'A' && *tmp_word <= 'Z')))
+					if (!isalpha(*word_reader))
 					{
 						return 0;
 					}
@@ -181,67 +190,48 @@ int match(char* word_start, char* word_end, char* pattern_start, char* pattern_e
 				break;
 
 			case '~':
-				if (*tmp_word == *(tmp_pattern + 1))
+				if (*word_reader == *(pattern_reader + 1))
 				{
 					return 0;
 				}
 				break;
 
 			case '[':
-				iterations = extract_iterations(tmp_pattern + 1, strstr(tmp_pattern, "*"));
-				tmp_pattern = strstr(tmp_pattern, "(");
-				pattern_length = count_pattern_length(tmp_pattern + 1, strstr(tmp_pattern, ")"));
+				iterations = extract_iterations(pattern_reader + 1, strstr(pattern_reader, "*"));
+				subpattern_start = strstr(pattern_reader, "(") + 1;
+				subpattern_end = go_while_bracket_sequence_is_invalid(subpattern_start, '(', ')');
+
+				pattern_length = count_pattern_length(subpattern_start, subpattern_end);
 
 				for (int i = 0; i < iterations; i++)
 				{
-					if (!(match(tmp_word, tmp_word + pattern_length, tmp_pattern + 1, strstr(tmp_pattern, ")"))))
+					if (!match(word_reader, word_reader + pattern_length, subpattern_start, subpattern_end))
 					{
 						return 0;
 					}
-					tmp_word += pattern_length;
-				}
-				brackets_count = 1;
-				while (brackets_count)
-				{
-					if (*tmp_pattern == '[')
-					{
-						brackets_count++;
-					}
-					else if (*tmp_pattern == ']')
-					{
-						brackets_count--;
-					}
-					tmp_pattern++;
+
+					word_reader += pattern_length;
 				}
 
-				tmp_pattern -= 2;
-				tmp_word--;
+				pattern_reader++;
+
+				pattern_reader = go_while_bracket_sequence_is_invalid(pattern_reader, '[', ']');
+
+				pattern_reader -= 2;
+				word_reader--;
 				break;
 
 			default:
 				break;
 			}
 
-			tmp_word++;
-			tmp_pattern += 2;
+			word_reader++;
+			pattern_reader += 2;
 		}
 	}
 
 	return 1;
 }
-
-//void print_word()
-//{
-//	char word[1024];
-//	scanf("%s", word);
-//	char* tmp = word;
-//
-//	while (*tmp)
-//	{
-//		printf("%c\n", *tmp);
-//		tmp++;
-//	}
-//}
 
 int main()
 {
@@ -258,12 +248,18 @@ int main()
 	int number, matches_count = 0;
 	fscanf(input, "%s", pattern);
 	fscanf(input, "%d", &number);
-	int pattern_length = strlen(pattern);
 
-	//printf("%d", count_pattern_length(pattern, pattern + strlen(pattern)));
-
+	char* pattern_end = pattern + strlen(pattern);
 	char** words = allocate_words(number);
+
+	if (!words)
+	{
+		printf("Can't allocate memory for words array");
+		return -1;
+	}
+
 	words = read_words(input, number, words);
+
 	fclose(input);
 
 	output = fopen("output.txt", "w");
@@ -276,7 +272,7 @@ int main()
 
 	for (int i = 0; i < number; i++)
 	{
-		if (match(words[i], words[i] + strlen(words[i]), pattern, pattern + pattern_length))
+		if (match(words[i], words[i] + strlen(words[i]), pattern, pattern_end))
 		{
 			fprintf(output, "%d ", i);
 			matches_count++;
