@@ -17,7 +17,7 @@ char** read_words(FILE* file, int number, char** words)
 	return words;
 }
 
-void free_words(char** words, int number)
+void free_words_array(char** words, int number)
 {
 	for (int i = 0; i < number; i++)
 	{
@@ -34,7 +34,7 @@ void free_words(char** words, int number)
 	free(words);
 }
 
-char** allocate_words(int number)
+char** allocate_words_array(int number)
 {
 	char** words = (char**)calloc(number, sizeof(char*));
 
@@ -49,35 +49,13 @@ char** allocate_words(int number)
 
 		if (!words[i])
 		{
-			free_words(words, number);
+			free_words_array(words, number);
 			return NULL;
 		}
 	}
 
 	return words;
 }
-
-//void print_words(char** words, int number)
-//{
-//	for (int i = 0; i < number; i++)
-//	{
-//		printf("%s\n", words[i]);
-//	}
-//}
-
-//int substr_count(char* str, char* substr)
-//{
-//	char* tmp = strstr(str, substr);
-//	int count = 0;
-//
-//	while (tmp)
-//	{
-//		tmp = strstr(tmp + 1, substr);
-//		count++;
-//	}
-//
-//	return count;
-//}
 
 int extract_iterations(char* exp_start, char* exp_end)
 {
@@ -250,7 +228,7 @@ int main()
 	fscanf(input, "%d", &number);
 
 	char* pattern_end = pattern + strlen(pattern);
-	char** words = allocate_words(number);
+	char** words = allocate_words_array(number);
 
 	if (!words)
 	{
@@ -285,6 +263,6 @@ int main()
 	}
 	fclose(output);
 
-	free_words(words, number);
+	free_words_array(words, number);
 	return 0;
 }
