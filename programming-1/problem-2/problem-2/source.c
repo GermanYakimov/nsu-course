@@ -95,20 +95,21 @@ char* go_while_bracket_sequence_is_invalid(char *start, char start_bracket, char
 int count_pattern_length(char* pattern_start, char* pattern_end)
 {
 	int length = 0;
-	char *reader = pattern_start;
+	char *reader = pattern_start, *tmp_reader;
 
 	while (reader != pattern_end)
 	{
 		if (*reader == '[')
 		{
-			length += extract_iterations(reader + 1, strstr(reader, "*")) * count_pattern_length(strstr(reader, "("), strstr(reader, ")"));
+			tmp_reader = go_while_bracket_sequence_is_invalid(reader + 1, '[', ']');
+			length += extract_iterations(reader + 1, strstr(reader, "*")) * count_pattern_length(strstr(reader, "("), go_while_bracket_sequence_is_invalid(strstr(reader, "(") + 1, '(', ')'));
 			reader++;
 
-			reader = go_while_bracket_sequence_is_invalid(reader, '[', ']');
+			reader = tmp_reader;
 			continue;
 		}
 
-		if (*reader != '\\' && *reader != '(' && *reader != '~' && *reader != ')')
+		if (*reader != '\\' && *reader != '(' && *reader != '~' && *reader != ')' && *reader != ']')
 		{
 			length++;
 		}
@@ -177,7 +178,7 @@ int match(char* word_start, char* word_end, char* pattern_start, char* pattern_e
 			case '[':
 				iterations = extract_iterations(pattern_reader + 1, strstr(pattern_reader, "*"));
 				subpattern_start = strstr(pattern_reader, "(") + 1;
-				subpattern_end = go_while_bracket_sequence_is_invalid(subpattern_start, '(', ')');
+				subpattern_end = go_while_bracket_sequence_is_invalid(subpattern_start, '(', ')') - 1;
 
 				pattern_length = count_pattern_length(subpattern_start, subpattern_end);
 
