@@ -7,11 +7,11 @@
 #define PATTERN_SIZE 64
 #define WORD_SIZE 1024
 
-typedef struct subpattern {
+typedef struct subexp {
 	int iterations;
 	char* expression;
 	int is_kleene_star;
-} subpattern ;
+} subexp ;
 
 char** read_words(FILE* file, int number, char** words)
 {
@@ -94,7 +94,7 @@ int extract_iterations(char* exp_start)
 }
 
 
-void print_subpatterns(subpattern* subpatterns, int size)
+void print_subpatterns(subexp* subpatterns, int size)
 {
 	for (int i = 0; i < size; i++)
 	{
@@ -102,138 +102,162 @@ void print_subpatterns(subpattern* subpatterns, int size)
 	}
 }
 
-void free_subpatterns(subpattern* subpatterns, int size)
+void free_subexpressions(subexp* subpatterns, int size)
 {
 	for (int i = 0; i < size; i++)
 	{
-		free((subpatterns + i)->expression);
+		if (*((subpatterns + i)->expression))
+		{
+			free((subpatterns + i)->expression);
+		}
 	}
 
 	free(subpatterns);
 }
 
-subpattern* split_pattern(char* pattern)
+subexp* split_pattern(char* pattern)
 {
 	int size = substr_count(pattern, "[") * 2 + 1;
-	int iterator = 0, subiterator = 0, iterations;
+	int iterator = 0;
 	char* pattern_reader = pattern;
 
-	subpattern* subpatterns = (subpattern*)calloc(size, sizeof(subpattern));
-	subpattern* subpatterns_reader = subpatterns;
+	subexp* subexpressions = (subexp*)calloc(size, sizeof(subexp));
 
-	if (!subpatterns)
+	if (!subexpressions)
 	{
 		return NULL;
 	}
 
+	subexp* subexpressions_reader = subexpressions;
+
 	for (int i = 0; i < size; i++)
 	{
-		subpatterns[i].expression = (char*)calloc(PATTERN_SIZE / size + 1, sizeof(char));
+		subexpressions[i].expression = (char*)calloc(PATTERN_SIZE / size + 1, sizeof(char));
+
+		if (!subexpressions[i].expression)
+		{
+			free_subexpressions(subexpressions, size);
+			return NULL;
+		}
 	}
 
 	while (*pattern_reader)
 	{
 		if (*pattern_reader != '[' && *pattern_reader != '(' && *pattern_reader != ')' && *pattern_reader != ']')
 		{
-			subpatterns_reader->expression[subiterator] = *pattern_reader;
-			subiterator++;
+			subexpressions_reader->expression[iterator] = *pattern_reader;
+			iterator++;
 
-			if (!subpatterns_reader->iterations)
+			if (!subexpressions_reader->iterations)
 			{
-				subpatterns_reader->iterations = 1;
+				subexpressions_reader->iterations = 1;
 			}
 		}
 		else if (*pattern_reader == '[')
 		{
-			subpatterns_reader++;
-			subiterator = 0;
+			subexpressions_reader++;
+			iterator = 0;
 
-			subpatterns_reader->iterations = extract_iterations(pattern_reader);
+			subexpressions_reader->iterations = extract_iterations(pattern_reader);
 			pattern_reader = strstr(pattern_reader, "(");
 		}
 		else if (*pattern_reader == ']' && *(pattern_reader + 1) != '[')
 		{
-			subpatterns_reader++;
-			subiterator = 0;
+			subexpressions_reader++;
+			iterator = 0;
 		}
 
 		pattern_reader++;
 	}
 
 	//print_subpatterns(subpatterns, size);
-	return subpatterns;
+	return subexpressions;
 }
 
-int match(char* word, subpattern* subpatterns)
+int match(char* expression, char** word)
 {
-	subpattern* current_subpattern = subpatterns;
-	char* current_expression_reader = current_subpattern->expression;
+	char* exp_reader = expression;
+	char** word_reader = word;
 
-	char *word_reader = word;
-
-	while (current_subpattern->expression && *word_reader)
+	while (*exp_reader && *(*word_reader))
 	{
-		for (int i = 0; i < current_subpattern->iterations; i++)
+		switch (*exp_reader)
 		{
-			current_expression_reader = current_subpattern->expression;
-
-			while (*current_expression_reader)
+		case '\\':
+			switch (*(exp_reader + 1))
 			{
-				if (!word_reader)
+			case 'd':
+				if (!isdigit(*(*word_reader)))
 				{
 					return 0;
 				}
+				(*word_reader)++;
+				exp_reader += 2;
+				break;
 
-				switch (*current_expression_reader)
+			case 'D':
+				if (!isalpha(*(*word_reader)))
 				{
-				case '\\':
-					switch (*(current_expression_reader + 1))
-					{
-					case 'd':
-						if (!isdigit(*word_reader))
-						{
-							return 0;
-						}
-						word_reader++;
-						current_expression_reader += 2;
-						break;
-
-					case 'D':
-						if (!isalpha(*word_reader))
-						{
-							return 0;
-						}
-						word_reader++;
-						current_expression_reader += 2;
-						break;
-
-					default:
-						break;
-					}
-					break;
-				case '~':
-					if (*word_reader == *(current_expression_reader + 1))
-					{
-						return 0;
-					}
-					word_reader++;
-					current_expression_reader += 2;
-					break;
-
-				default:
-					if (*current_expression_reader != *word_reader)
-					{
-						return 0;
-					}
-
-					current_expression_reader++;
-					word_reader++;
-					break;
+					return 0;
 				}
+				(*word_reader)++;
+				exp_reader += 2;
+				break;
+
+			default:
+				break;
+			}
+			break;
+		case '~':
+			if (*(*word_reader) == *(exp_reader + 1))
+			{
+				return 0;
+			}
+			(*word_reader)++;
+			exp_reader += 2;
+			break;
+
+		default:
+			if (*exp_reader != *(*word_reader))
+			{
+				return 0;
+			}
+
+			exp_reader++;
+			(*word_reader)++;
+			break;
+		}
+	}
+
+	if (*exp_reader && !*(*word_reader))
+	{
+		return 0;
+	}
+
+	return 1;
+}
+
+int compare(char* word, subexp* subexpressions)
+{
+	subexp* current_subexp = subexpressions;
+
+	char* current_exp_reader = current_subexp->expression;
+
+	char *word_reader = word;
+
+	while (current_subexp->expression && *word_reader)
+	{
+		for (int i = 0; i < current_subexp->iterations; i++)
+		{
+			current_exp_reader = current_subexp->expression;
+
+			if (!match(current_subexp->expression, &word_reader))
+			{
+				return 0;
 			}
 		}
 
-		current_subpattern++;
+		current_subexp++;
 	}
 
 	return 1;
@@ -267,7 +291,13 @@ int main()
 
 	fclose(input);
 
-	subpattern* subpatterns = split_pattern(pattern);
+	subexp* subexpressions = split_pattern(pattern);
+
+	if (!subexpressions)
+	{
+		printf("Can't allocate memory for subexpressions");
+		return -1;
+	}
 
 	output = fopen("output.txt", "w");
 
@@ -279,7 +309,7 @@ int main()
 
 	for (int i = 0; i < number; i++)
 	{
-		if (match(words[i], subpatterns))
+		if (compare(words[i], subexpressions))
 		{
 			fprintf(output, "%d ", i);
 			matches_count++;
@@ -293,6 +323,6 @@ int main()
 	fclose(output);
 
 	free_words_array(words, number);
-	free_subpatterns(subpatterns, substr_count(pattern, "[") * 2 + 1);
+	free_subexpressions(subexpressions, substr_count(pattern, "[") * 2 + 1);
 	return 0;
 }
