@@ -10,7 +10,6 @@
 typedef struct subexp {
 	int iterations;
 	char* expression;
-	int is_kleene_star;
 } subexp ;
 
 char** read_words(FILE* file, int number, char** words)
@@ -117,7 +116,7 @@ void free_subexpressions(subexp* subpatterns, int size)
 
 subexp* split_pattern(char* pattern)
 {
-	int size = substr_count(pattern, "[") * 2 + 1;
+	int size = (substr_count(pattern, "[") + substr_count(pattern, "<"))* 2 + 1;
 	int iterator = 0;
 	char* pattern_reader = pattern;
 
@@ -143,7 +142,7 @@ subexp* split_pattern(char* pattern)
 
 	while (*pattern_reader)
 	{
-		if (*pattern_reader != '[' && *pattern_reader != '(' && *pattern_reader != ')' && *pattern_reader != ']')
+		if (*pattern_reader != '[' && *pattern_reader != '(' && *pattern_reader != ')' && *pattern_reader != ']' && *pattern_reader != '<' && *pattern_reader != '>' && *pattern_reader != '*')
 		{
 			subexpressions_reader->expression[iterator] = *pattern_reader;
 			iterator++;
@@ -166,11 +165,24 @@ subexp* split_pattern(char* pattern)
 			subexpressions_reader++;
 			iterator = 0;
 		}
+		else if (*pattern_reader == '<')
+		{
+			subexpressions_reader++;
+			iterator = 0;
+
+			subexpressions_reader->iterations = INT_MAX;
+			//pattern_reader = strstr(pattern_reader, "<");
+		}
+		else if (*pattern_reader == '>' && *(pattern_reader + 1) != '<')
+		{
+			subexpressions_reader++;
+			iterator = 0;
+		}
 
 		pattern_reader++;
 	}
 
-	//print_subpatterns(subpatterns, size);
+	//print_subpatterns(subexpressions, size);
 	return subexpressions;
 }
 
@@ -243,21 +255,35 @@ int compare(char* word, subexp* subexpressions)
 
 	char* current_exp_reader = current_subexp->expression;
 
-	char *word_reader = word;
+	char *word_reader = word, *word_reader_copy;
 
 	while (current_subexp->expression && *word_reader)
 	{
 		for (int i = 0; i < current_subexp->iterations; i++)
 		{
-			current_exp_reader = current_subexp->expression;
+			word_reader_copy = word_reader;
 
 			if (!match(current_subexp->expression, &word_reader))
 			{
-				return 0;
+				if (current_subexp->iterations < INT_MAX)
+				{
+					return 0;
+				}
+				else
+				{
+					word_reader = word_reader_copy;
+					break;
+				}
 			}
 		}
 
 		current_subexp++;
+		current_exp_reader = current_subexp->expression;
+	}
+
+	if (!(*word_reader) && current_subexp->expression)
+	{
+		return 0;
 	}
 
 	return 1;
