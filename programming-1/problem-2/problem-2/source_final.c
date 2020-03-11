@@ -202,7 +202,7 @@ char *compare_iterations(char *word, char *pattern)
 
 				if (!pattern_reader)
 				{
-					return 0;
+					return NULL;
 				}
 
 				word_reader++;
