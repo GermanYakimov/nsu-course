@@ -14,7 +14,7 @@ typedef struct match_result {
 	int match;
 } state;
 
-char *compare_iterations(char *word, char *pattern);
+char *compare_iterations(char *word, char *pattern, char* unexpected_symbols);
 state match(char* pattern, char* word, char* unexpected_symbols);
 
 char **read_words(FILE* file, int number, char **words)
@@ -133,7 +133,7 @@ char *compare_symbol(char symbol, char *pattern)
 	return pattern;
 }
 
-char *compare_kleene_star(char *word, char *pattern)
+char *compare_kleene_star(char *word, char *pattern, char *unexpected_symbols)
 {
 	char *word_reader = word, *pattern_reader = strstr(pattern, "<") + 1;
 	char *pattern_end = strstr(pattern, ">"), *pattern_start = pattern_reader, *last_position = word_reader;
@@ -146,7 +146,7 @@ char *compare_kleene_star(char *word, char *pattern)
 
 		while (*word_reader && pattern_reader != pattern_end)
 		{
-			match_result = match(pattern_reader, word_reader, "<>");
+			match_result = match(pattern_reader, word_reader, unexpected_symbols);
 
 			if (!match_result.match)
 			{
@@ -159,6 +159,7 @@ char *compare_kleene_star(char *word, char *pattern)
 
 		if (!(*word_reader))
 		{
+			
 			return last_position;
 		}
 
@@ -168,7 +169,7 @@ char *compare_kleene_star(char *word, char *pattern)
 	return last_position;
 }
 
-char *compare_iterations(char *word, char *pattern)
+char *compare_iterations(char *word, char *pattern, char *unexpected_symbols)
 {
 	int iterations = extract_iterations(pattern);
 	char *word_reader = word, *pattern_reader = strstr(pattern, "(") + 1;
@@ -182,7 +183,7 @@ char *compare_iterations(char *word, char *pattern)
 
 		while (*word_reader && pattern_reader != pattern_end)
 		{
-			match_result = match(pattern_reader, word_reader, "[]");
+			match_result = match(pattern_reader, word_reader, unexpected_symbols);
 
 			if (!match_result.match)
 			{
@@ -241,7 +242,7 @@ state match(char *pattern, char *word, char* unexpected_symbols)
 	switch (*pattern_reader)
 	{
 	case '[':
-		word_reader = compare_iterations(word_reader, pattern_reader);
+		word_reader = compare_iterations(word_reader, pattern_reader, unexpected_symbols);
 
 		if (!word_reader)
 		{
@@ -256,7 +257,7 @@ state match(char *pattern, char *word, char* unexpected_symbols)
 		break;
 
 	case '<':
-		word_reader = compare_kleene_star(word_reader, pattern_reader);
+		word_reader = compare_kleene_star(word_reader, pattern_reader, unexpected_symbols);
 		pattern_reader = strstr(pattern_reader, ">") + 2;
 		break;
 
