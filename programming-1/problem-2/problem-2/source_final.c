@@ -15,7 +15,7 @@ typedef struct match_result {
 } state;
 
 char *compare_iterations(char *word, char *pattern);
-state match(char* pattern, char* word);
+state match(char* pattern, char* word, char* unexpected_symbols);
 
 char **read_words(FILE* file, int number, char **words)
 {
@@ -146,7 +146,7 @@ char *compare_kleene_star(char *word, char *pattern)
 
 		while (*word_reader && pattern_reader != pattern_end)
 		{
-			match_result = match(pattern_reader, word_reader);
+			match_result = match(pattern_reader, word_reader, "<>");
 
 			if (!match_result.match)
 			{
@@ -155,32 +155,6 @@ char *compare_kleene_star(char *word, char *pattern)
 
 			pattern_reader = match_result.pattern_reader;
 			word_reader = match_result.word_reader;
-
-			//switch (*pattern_reader)
-			//{
-			//case '[':
-			//	word_reader = compare_iterations(word_reader, pattern_reader);
-
-			//	if (!word_reader)
-			//	{
-			//		return last_position;
-			//	}
-
-			//	pattern_reader = strstr(pattern_reader, "]") + 1;
-			//	break;
-
-			//case '\\':
-			//case '~':
-			//default:
-			//	pattern_reader = compare_symbol(*word_reader, pattern_reader);
-
-			//	if (!pattern_reader)
-			//	{
-			//		return last_position;
-			//	}
-
-			//	word_reader++;
-			//}
 		}
 
 		if (!(*word_reader))
@@ -208,7 +182,7 @@ char *compare_iterations(char *word, char *pattern)
 
 		while (*word_reader && pattern_reader != pattern_end)
 		{
-			match_result = match(pattern_reader, word_reader);
+			match_result = match(pattern_reader, word_reader, "[]");
 
 			if (!match_result.match)
 			{
@@ -217,31 +191,6 @@ char *compare_iterations(char *word, char *pattern)
 
 			pattern_reader = match_result.pattern_reader;
 			word_reader = match_result.word_reader;
-
-			//switch (*pattern_reader)
-			//{
-			//case '<':
-			//	word_reader = compare_kleene_star(word_reader, pattern_reader);
-			//	pattern_reader = strstr(pattern_reader, ">") + 2;
-			//	break;
-
-			//case '\\':
-			//case '~':
-			//default:
-			//	pattern_reader = compare_symbol(*word_reader, pattern_reader);
-
-			//	if (!pattern_reader)
-			//	{
-			//		return NULL;
-			//	}
-
-			//	word_reader++;
-			//}
-
-			//if (!(*word_reader))
-			//{
-			//	return NULL;
-			//}
 		}
 
 		if (!(*word_reader))
@@ -260,7 +209,7 @@ int compare(char *word, char *pattern)
 
 	while (*word_reader && *pattern_reader)
 	{
-		match_result = match(pattern_reader, word_reader);
+		match_result = match(pattern_reader, word_reader, "");
 
 		if (!match_result.match)
 		{
@@ -270,49 +219,24 @@ int compare(char *word, char *pattern)
 		word_reader = match_result.word_reader;
 		pattern_reader = match_result.pattern_reader;
 
-		//switch (*pattern_reader)
-		//{
-		//case '[':
-		//	word_reader = compare_iterations(word_reader, pattern_reader);
-
-		//	if (!word_reader)
-		//	{
-		//		return 0;
-		//	}
-
-		//	pattern_reader = strstr(pattern_reader, "]") + 1;
-		//	break;
-
-		//case '<':
-		//	word_reader = compare_kleene_star(word_reader, pattern_reader);
-		//	pattern_reader = strstr(pattern_reader, ">") + 2;
-		//	break;
-
-		//case '\\':
-		//case '~':
-		//default:
-		//	pattern_reader = compare_symbol(*word_reader, pattern_reader);
-
-		//	if (!pattern_reader)
-		//	{
-		//		return 0;
-		//	}
-
-		//	word_reader++;
-		//}
 	}
 
 	return 1;
 }
 
-state match(char *pattern, char *word)
+state match(char *pattern, char *word, char* unexpected_symbols)
 {
-	char *pattern_reader = pattern, *word_reader = word;
-
 	state result;
 	result.match = 0;
-	result.pattern_reader = pattern_reader;
-	result.word_reader = word_reader;
+	result.pattern_reader = pattern;
+	result.word_reader = word;
+
+	if (strchr(unexpected_symbols, *pattern))
+	{
+		return result;
+	}
+
+	char *pattern_reader = pattern, *word_reader = word;
 
 	switch (*pattern_reader)
 	{
