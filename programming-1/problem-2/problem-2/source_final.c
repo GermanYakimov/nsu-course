@@ -7,6 +7,7 @@
 
 #define PATTERN_SIZE 64
 #define WORD_SIZE 1024
+#define MAX_PATTERN_SIZE 2048
 
 typedef struct match_result {
 	char *pattern_reader;
@@ -14,9 +15,9 @@ typedef struct match_result {
 	int match;
 } state;
 
-char *compare_iterations(char *word, char *pattern);
 state match(char* pattern, char* word, char* unexpected_symbols);
 int compare(char *word, char *pattern);
+int extract_iterations(char *expression);
 
 char **read_words(FILE* file, int number, char **words)
 {
@@ -43,6 +44,76 @@ void free_words_array(char **words, int number)
 	}
 
 	free(words);
+}
+
+char *strcut(char* begin, char* end)
+{
+	int a = end - begin;
+	char* result = (char*)calloc(end - begin + 1, sizeof(char));
+
+	if (!result)
+	{
+		printf("Can't allocate memory for str");
+		return NULL;
+	}
+
+	int counter = 0;
+
+	while (begin != end)
+	{
+		result[counter] = *begin;
+		begin++;
+		counter++;
+	}
+
+	return result;
+}
+
+char *make_pattern(char *pattern)
+{
+	char *pattern_reader = pattern;
+	char* tmp;
+	char *new_pattern = (char*)calloc(MAX_PATTERN_SIZE, sizeof(char));
+
+	if (!new_pattern)
+	{
+		printf("Can't allocate memory for new pattern");
+		return NULL;
+	}
+
+	int counter = 0, iterations;
+
+	while (*pattern_reader)
+	{
+		if (*pattern_reader == '[')
+		{
+			tmp = strcut(strstr(pattern_reader, "(") + 1, strstr(pattern_reader, ")"));
+
+			if (!tmp)
+			{
+				return NULL;
+			}
+
+			iterations = extract_iterations(pattern_reader);
+
+			for (int i = 0; i < iterations; i++)
+			{
+				new_pattern = strcat(new_pattern, tmp);
+			}
+
+			free(tmp);
+			pattern_reader = strstr(pattern_reader, "]") + 1;
+			counter = strlen(new_pattern);
+		}
+		else
+		{
+			new_pattern[counter] = *pattern_reader;
+			pattern_reader++;
+			counter++;
+		}
+	}
+
+	return new_pattern;
 }
 
 char **allocate_words_array(int number)
@@ -166,40 +237,6 @@ char *compare_kleene_star(char *word, char *pattern)
 	return last_position;
 }
 
-char *compare_iterations(char *word, char *pattern)
-{
-	int iterations = extract_iterations(pattern);
-	char *word_reader = word, *pattern_reader = strstr(pattern, "(") + 1;
-	char *pattern_end = strstr(pattern, ")"), *pattern_start = pattern_reader;
-
-	state match_result;
-
-	for (int i = 0; i < iterations; i++)
-	{
-		pattern_reader = pattern_start;
-
-		while (*word_reader && pattern_reader != pattern_end)
-		{
-			match_result = match(pattern_reader, word_reader, "[]");
-
-			if (!match_result.match)
-			{
-				return NULL;
-			}
-
-			pattern_reader = match_result.pattern_reader;
-			word_reader = match_result.word_reader;
-		}
-
-		if (!(*word_reader) && pattern_reader != pattern_end)
-		{
-			return NULL;
-		}
-	}
-
-	return word_reader;
-}
-
 int compare(char *word, char *pattern)
 {
 	char* word_reader = word, *pattern_reader = pattern;
@@ -224,6 +261,11 @@ int compare(char *word, char *pattern)
 
 	}
 
+	if (!(*word_reader) && *pattern_reader)
+	{
+		return 0;
+	}
+
 	return 1;
 }
 
@@ -244,21 +286,6 @@ state match(char *pattern, char *word, char* unexpected_symbols)
 
 	switch (*pattern_reader)
 	{
-	case '[':
-		word_reader = compare_iterations(word_reader, pattern_reader);
-
-		if (!word_reader)
-		{
-			result.match = 0;
-			result.pattern_reader = pattern_reader;
-			result.word_reader = word_reader;
-
-			return result;
-		}
-
-		pattern_reader = strstr(pattern_reader, "]") + 1;
-		break;
-
 	case '<':
 		for (int i = 0; i < INT_MAX; i++)
 		{
@@ -312,6 +339,7 @@ state match(char *pattern, char *word, char* unexpected_symbols)
 int main()
 {
 	char pattern[PATTERN_SIZE];
+	char* pattern_modified;
 	FILE *input, *output;
 	input = fopen("input.txt", "r");
 
@@ -337,6 +365,13 @@ int main()
 
 	fclose(input);
 
+	pattern_modified = make_pattern(pattern);
+
+	if (!pattern_modified)
+	{
+		return NULL;
+	}
+
 	output = fopen("output.txt", "w");
 
 	if (!output)
@@ -347,7 +382,7 @@ int main()
 
 	for (int i = 0; i < number; i++)
 	{
-		if (compare(words[i], pattern))
+		if (compare(words[i], pattern_modified))
 		{
 			fprintf(output, "%d ", i);
 			matches_count++;
@@ -361,6 +396,7 @@ int main()
 	fclose(output);
 
 	free_words_array(words, number);
+	free(pattern_modified);
 
 	return 0;
 }
