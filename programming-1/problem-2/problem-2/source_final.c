@@ -16,6 +16,7 @@ typedef struct match_result {
 
 char *compare_iterations(char *word, char *pattern);
 state match(char* pattern, char* word, char* unexpected_symbols);
+int compare(char *word, char *pattern);
 
 char **read_words(FILE* file, int number, char **words)
 {
@@ -140,31 +141,27 @@ char *compare_kleene_star(char *word, char *pattern)
 
 	state match_result;
 
-	for (int i = 0; i < INT_MAX; i++)
+	pattern_reader = pattern_start;
+
+	while (*word_reader && pattern_reader != pattern_end)
 	{
-		pattern_reader = pattern_start;
+		match_result = match(pattern_reader, word_reader, "<>");
 
-		while (*word_reader && pattern_reader != pattern_end)
+		if (!match_result.match)
 		{
-			match_result = match(pattern_reader, word_reader, "<>");
-
-			if (!match_result.match)
-			{
-				return last_position;
-			}
-
-			pattern_reader = match_result.pattern_reader;
-			word_reader = match_result.word_reader;
-		}
-
-		if (!(*word_reader))
-		{
-			
 			return last_position;
 		}
 
-		last_position = word_reader;
+		pattern_reader = match_result.pattern_reader;
+		word_reader = match_result.word_reader;
 	}
+
+	if (!(*word_reader))
+	{
+		return last_position;
+	}
+
+	last_position = word_reader;
 
 	return last_position;
 }
@@ -194,7 +191,7 @@ char *compare_iterations(char *word, char *pattern)
 			word_reader = match_result.word_reader;
 		}
 
-		if (!(*word_reader))
+		if (!(*word_reader) && pattern_reader != pattern_end)
 		{
 			return NULL;
 		}
@@ -217,6 +214,11 @@ int compare(char *word, char *pattern)
 			return 0;
 		}
 
+		if (match_result.match == 200)
+		{
+			return 1;
+		}
+
 		word_reader = match_result.word_reader;
 		pattern_reader = match_result.pattern_reader;
 
@@ -231,6 +233,7 @@ state match(char *pattern, char *word, char* unexpected_symbols)
 	result.match = 0;
 	result.pattern_reader = pattern;
 	result.word_reader = word;
+	char *last_position;
 
 	if (strchr(unexpected_symbols, *pattern))
 	{
@@ -257,7 +260,28 @@ state match(char *pattern, char *word, char* unexpected_symbols)
 		break;
 
 	case '<':
-		word_reader = compare_kleene_star(word_reader, pattern_reader);
+		for (int i = 0; i < INT_MAX; i++)
+		{
+			if (compare(word_reader, strstr(pattern_reader, ">") + 2))
+			{
+				result.match = 200;
+				result.pattern_reader = pattern_reader;
+				result.word_reader = word_reader;
+
+				return result;
+			}
+			last_position = word_reader;
+			word_reader = compare_kleene_star(word_reader, pattern_reader);
+
+			if (word_reader == last_position)
+			{
+				result.match = 0;
+				result.pattern_reader = pattern_reader;
+				result.word_reader = word_reader;
+
+				return result;
+			}
+		}
 		pattern_reader = strstr(pattern_reader, ">") + 2;
 		break;
 
