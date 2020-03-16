@@ -48,7 +48,6 @@ void free_words_array(char **words, int number)
 
 char *strcut(char* begin, char* end)
 {
-	int a = end - begin;
 	char* result = (char*)calloc(end - begin + 1, sizeof(char));
 
 	if (!result)
