@@ -1,12 +1,16 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <ctime>
-using namespace std;
+#include<stdio.h>
+#include<stdlib.h>
 
-vector<int> make_heap(vector<int> arr, int border)
+void swap(int *first, int *second)
 {
-	int i, index, parent, size = arr.size() - border;
+	int tmp = *first;
+	*first = *second;
+	*second = tmp;
+}
+
+int *make_heap(int *arr, int size)
+{
+	int i, index, parent;
 
 	for (i = 0; i < size; i++)
 	{
@@ -22,7 +26,7 @@ vector<int> make_heap(vector<int> arr, int border)
 			}
 			else
 			{
-				swap(arr[index], arr[parent]);
+				swap(arr + index, arr + parent);
 				index = parent;
 			}
 		}
@@ -31,7 +35,7 @@ vector<int> make_heap(vector<int> arr, int border)
 	return arr;
 }
 
-vector<int> fix_heap(vector<int> arr, int border)
+int *fix_heap(int* arr, int size)
 {
 	int index = 0, child_1, child_2;
 	bool cond_1, cond_2;
@@ -41,8 +45,8 @@ vector<int> fix_heap(vector<int> arr, int border)
 		child_1 = 2 * index + 1;
 		child_2 = 2 * index + 2;
 
-		cond_1 = child_1 >= arr.size() - border;
-		cond_2 = child_2 >= arr.size() - border;
+		cond_1 = child_1 >= size;
+		cond_2 = child_2 >= size;
 
 		if (cond_1 && cond_2)
 		{
@@ -52,7 +56,7 @@ vector<int> fix_heap(vector<int> arr, int border)
 		{
 			if (arr[child_1] > arr[index])
 			{
-				swap(arr[child_1], arr[index]);
+				swap(arr + child_1, arr + index);
 				index = child_1;
 			}
 			else
@@ -66,7 +70,7 @@ vector<int> fix_heap(vector<int> arr, int border)
 			{
 				if (arr[child_2] > arr[index])
 				{
-					swap(arr[child_2], arr[index]);
+					swap(arr + child_2, arr + index);
 					index = child_2;
 				}
 				else
@@ -78,7 +82,7 @@ vector<int> fix_heap(vector<int> arr, int border)
 			{
 				if (arr[child_1] > arr[index])
 				{
-					swap(arr[child_1], arr[index]);
+					swap(arr + child_1, arr + index);
 					index = child_1;
 				}
 				else
@@ -92,68 +96,16 @@ vector<int> fix_heap(vector<int> arr, int border)
 	return arr;
 }
 
-vector<int> remove_top_item(vector<int> heap)
+int *sort(int *numbers, int size)
 {
-	heap[0] = *(heap.end() - 1);
-	heap.pop_back();
+	int i, heap_start = 0, border = 1;
 
-	int index, child_1, child_2, size = heap.size(), swap_child;
-	index = 0;
-
-	while (true)
-	{
-		if (index >= size)
-		{
-			break;
-		}
-
-		child_1 = index * 2 + 1;
-		child_2 = child_1 + 1;
-
-		if (child_1 >= size)
-		{
-			child_1 = index;
-		}
-
-		if (child_2 >= size)
-		{
-			child_2 = index;
-		}
-
-		if (heap[index] >= heap[child_1] && heap[index] >= heap[child_2])
-		{
-			break;
-		}
-
-		if (heap[child_1] > heap[child_2])
-		{
-			swap_child = child_1;
-		}
-		else
-		{
-			swap_child = child_2;
-		}
-
-		swap(heap[index], heap[swap_child]);
-		index = swap_child;
-	}
-
-	return heap;
-}
-
-vector<int> sort(vector<int> numbers)
-{
-	int i, size = numbers.size();
-	int heap_start = 0;
-	int border = 0;
-
-	numbers = make_heap(numbers, border);
-	border++;
+	numbers = make_heap(numbers, size);
 
 	for (i = 0; i < size - 1; i++)
 	{
-		swap(numbers[0], numbers[numbers.size() - border]);
-		numbers = fix_heap(numbers, border);
+		swap(numbers, numbers + size - border);
+		numbers = fix_heap(numbers, size - border);
 		border++;
 	}
 
@@ -162,26 +114,6 @@ vector<int> sort(vector<int> numbers)
 
 int main()
 {
-	srand(time(0));
-	int i, j, len;
-	cin >> len;
-
-	vector<int> numbers(len);
-
-	for (i = 0; i < len; i++)
-	{
-		numbers[i] = rand() % 1000;
-		cout << numbers[i] << " ";
-	}
-	cout << endl << endl;
-
-	numbers = sort(numbers);
-
-	for (j = 0; j < numbers.size(); j++)
-	{
-		cout << numbers[j] << " ";
-	}
-	cout << endl;
 
 	return 0;
 }
