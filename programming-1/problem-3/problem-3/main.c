@@ -302,7 +302,10 @@ matrix *read_matrixes(FILE *input, int size)
 	return matrixes;
 }
 
-
+int greater(matrix one, matrix two)
+{
+	return one.det > two.det;
+}
 
 int main()
 {
@@ -327,8 +330,9 @@ int main()
 
 	for (int i = 0; i < size; i++)
 	{
-		print_matrix(matrixes[i]);
-		printf("det: %d\n", det(matrixes[i].data, matrixes[i].size));
+		//print_matrix(matrixes[i]);
+		matrixes[i].det = det(matrixes[i].data, matrixes[i].size);
+		//printf("det: %d\n", det(matrixes[i].data, matrixes[i].size));
 	}
 
 	fclose(input);
