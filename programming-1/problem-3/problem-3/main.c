@@ -5,6 +5,7 @@
 
 typedef struct matrix {
 	int size;
+	int det;
 	int **data;
 } matrix;
 
@@ -149,11 +150,11 @@ void free_matrixes(matrix* matrixes, int number)
 
 matrix* allocate_matrix(int size)
 {
-	matrix result;
-	result.size = size;
+	matrix *result = (matrix*)malloc(sizeof(matrix));
+	result->size = size;
 
-	result.data = (int**)calloc(size, sizeof(int*));
-	if (!result.data)
+	result->data = (int**)calloc(size, sizeof(int*));
+	if (!result->data)
 	{
 		printf("Can't allocate memory for matrix");
 		return NULL;
@@ -161,16 +162,105 @@ matrix* allocate_matrix(int size)
 
 	for (int i = 0; i < size; i++)
 	{
-		result.data[i] = (int*)calloc(size, sizeof(int));
+		result->data[i] = (int*)calloc(size, sizeof(int));
 
-		if (!result.data[i])
+		if (!result->data[i])
 		{
 			printf("Can't allocate memory for matrix");
 			return NULL;
 		}
 	}
 
-	return &result;
+	return result;
+}
+
+void print_matrix(matrix matrix)
+{
+	for (int i = 0; i < matrix.size; i++)
+	{
+		for (int j = 0; j < matrix.size; j++)
+		{
+			printf("%d ", matrix.data[i][j]);
+		}
+		printf("\n");
+	}
+}
+
+void print_matrix_1(int** matrix, int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		for (int j = 0; j < size; j++)
+		{
+			printf("%d ", matrix[i][j]);
+		}
+		printf("\n");
+	}
+}
+
+int **delete_row_and_column(int **M, int **result, int row, int column, int size)
+{
+	int tmp_i = 0, tmp_j = 0;
+
+	for (int i = 0; i < size; i++)
+	{
+		if (i == row)
+		{
+			continue;
+		}
+		tmp_j = 0;
+
+		for (int j = 0; j < size; j++)
+		{
+			if (j == column)
+			{
+				continue;
+			}
+			result[tmp_i][tmp_j] = M[i][j];
+			tmp_j++;
+		}
+
+		tmp_i++;
+
+	}
+
+	//print_matrix_1(result, size - 1);
+	return result;
+}
+
+int det(int **M, int size)
+{
+	if (size == 1)
+	{
+		return M[0][0];
+	}
+
+	if (size == 2)
+	{
+		return M[0][0] * M[1][1] - M[1][0] * M[0][1];
+	}
+
+	int result = 0;
+	int **tmp_matrix = (int**)calloc(size - 1, sizeof(int*));
+
+	for (int i = 0; i < size - 1; i++)
+	{
+		tmp_matrix[i] = (int*)malloc((size - 1) * sizeof(int));
+	}
+
+	for (int i = 0; i < size; i++)
+	{
+		result = result +  (-1)*(-1 + 2 * (i % 2)) * M[0][i] * det(delete_row_and_column(M, tmp_matrix, 0, i, size), size - 1);
+	}
+
+	for (int i = 0; i < size - 1; i++)
+	{
+		free(tmp_matrix[i]);
+	}
+
+	free(tmp_matrix);
+
+	return result;
 }
 
 matrix *read_matrixes(FILE *input, int size)
@@ -198,6 +288,7 @@ matrix *read_matrixes(FILE *input, int size)
 			return NULL;
 		}
 		matrixes[i] = *tmp;
+		free(tmp);
 
 		for (int j = 0; j < order; j++)
 		{
@@ -211,17 +302,7 @@ matrix *read_matrixes(FILE *input, int size)
 	return matrixes;
 }
 
-void print_matrix(matrix matrix)
-{
-	for (int i = 0; i < matrix.size; i++)
-	{
-		for (int j = 0; j < matrix.size; j++)
-		{
-			printf("%d ", matrix.data[i][j]);
-		}
-		printf("\n");
-	}
-}
+
 
 int main()
 {
@@ -247,6 +328,7 @@ int main()
 	for (int i = 0; i < size; i++)
 	{
 		print_matrix(matrixes[i]);
+		printf("det: %d\n", det(matrixes[i].data, matrixes[i].size));
 	}
 
 	fclose(input);
