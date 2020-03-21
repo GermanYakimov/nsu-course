@@ -3,16 +3,16 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-void swap(void *a, void *b, size_t size)
+void swap(void *first, void *second, size_t size)
 {
-	size_t __size = (size);
-	char *__a = (char*)(a), *__b = (char*)(b), __tmp;
+	size_t _size = size;
+	char *_first = (char*)first, *_second = (char*)second, _tmp;
 	do
 	{
-		__tmp = *__a;
-		*__a++ = *__b;
-		*__b++ = __tmp;
-	} while (--__size > 0);
+		_tmp = *_first;
+		*_first++ = *_second;
+		*_second++ = _tmp;
+	} while (--_size > 0);
 }
 
 typedef struct matrix {
