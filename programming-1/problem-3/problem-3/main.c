@@ -4,23 +4,48 @@
 #include<stdlib.h>
 
 typedef struct matrix {
-	int size;
-	int det;
+	short size;
+	short det;
 	int **data;
 } matrix;
 
-void swap(int *first, int *second)
+
+int greater(void* one, void* two)
 {
-	int tmp = *first;
-	*first = *second;
-	*second = tmp;
+	matrix* one_tmp = (matrix*)one;
+	matrix* two_tmp = (matrix*)two;
+	return one_tmp->det - two_tmp->det;
 }
 
-int *make_heap(int *arr, int size)
+void swap(void *first, void *second)
+{
+	unsigned long long t = *(unsigned long long *)(first);
+	*(unsigned long long *)(first) = *(unsigned long long *)(second);
+	*(unsigned long long *)(second) = t;
+
+	//	void *tmp = *first;
+	//	*first = *second;
+	//	*second = tmp;
+}
+
+void print_matrix(FILE *file, matrix *matrix)
+{
+	for (int i = 0; i < matrix->size; i++)
+	{
+		for (int j = 0; j < matrix->size; j++)
+		{
+			fprintf(file, "%d ", matrix->data[i][j]);
+		}
+		fprintf(file, "\n");
+	}
+}
+
+void *make_heap(void *base, size_t num, size_t size, int(*compar)(void*, void*))
 {
 	int i, index, parent;
+	char *arr = (char*)base;
 
-	for (i = 0; i < size; i++)
+	for (i = 0; i < num; i++)
 	{
 		index = i;
 
@@ -28,13 +53,15 @@ int *make_heap(int *arr, int size)
 		{
 			parent = (index - 1) / 2;
 
-			if (0 <= parent <= size && arr[index] <= arr[parent])
+			if (0 <= parent <= num && compar(arr + index * size, arr + parent * size) <= 0)
 			{
 				break;
 			}
 			else
 			{
-				swap(arr + index, arr + parent);
+				swap(arr + index * size, arr + parent * size);
+				//print_matrix(arr + index * size);
+				//print_matrix(arr + parent * size);
 				index = parent;
 			}
 		}
@@ -43,18 +70,19 @@ int *make_heap(int *arr, int size)
 	return arr;
 }
 
-int *fix_heap(int* arr, int size)
+void *fix_heap(void *base, size_t num, size_t size, int(*compar)(void*, void*))
 {
 	int index = 0, child_1, child_2;
 	int cond_1, cond_2;
+	char *arr = (char*)base;
 
 	while (1)
 	{
 		child_1 = 2 * index + 1;
 		child_2 = 2 * index + 2;
 
-		cond_1 = child_1 >= size;
-		cond_2 = child_2 >= size;
+		cond_1 = child_1 >= num;
+		cond_2 = child_2 >= num;
 
 		if (cond_1 && cond_2)
 		{
@@ -62,9 +90,9 @@ int *fix_heap(int* arr, int size)
 		}
 		else if (cond_2)
 		{
-			if (arr[child_1] > arr[index])
+			if (compar(arr + child_1 * size, arr + index * size) > 0)
 			{
-				swap(arr + child_1, arr + index);
+				swap(arr + child_1*size, arr + index*size);
 				index = child_1;
 			}
 			else
@@ -74,11 +102,11 @@ int *fix_heap(int* arr, int size)
 		}
 		else
 		{
-			if (arr[child_2] >= arr[child_1])
+			if (compar(arr + child_2*size , arr + child_1*size) >= 0)
 			{
-				if (arr[child_2] > arr[index])
+				if (compar(arr + child_2*size, arr + index*size) > 0)
 				{
-					swap(arr + child_2, arr + index);
+					swap(arr + child_2*size, arr + index*size);
 					index = child_2;
 				}
 				else
@@ -88,9 +116,9 @@ int *fix_heap(int* arr, int size)
 			}
 			else
 			{
-				if (arr[child_1] > arr[index])
+				if (compar(arr + child_1 * size, arr + index * size) > 0)
 				{
-					swap(arr + child_1, arr + index);
+					swap(arr + child_1*size, arr + index*size);
 					index = child_1;
 				}
 				else
@@ -104,20 +132,28 @@ int *fix_heap(int* arr, int size)
 	return arr;
 }
 
-int *sort(int *numbers, int size)
+void *sort(void *base, size_t num, size_t size, int(*compar)(void*, void*))
 {
 	int i, heap_start = 0, border = 1;
+	char *arr = (char*)base;
 
-	numbers = make_heap(numbers, size);
+	arr = (char*)make_heap(base, num, size, greater);
 
-	for (i = 0; i < size - 1; i++)
+	//for (int i = 0; i < num; i++)
+	//{
+	//	print_matrix(arr + i*size);
+	//}
+
+	for (i = 0; i < num - 1; i++)
 	{
-		swap(numbers, numbers + size - border);
-		numbers = fix_heap(numbers, size - border);
+		swap(arr, arr + (num - border) * size);
+		//print_matrix(arr);
+		//print_matrix(arr + (num - border) * size);
+		arr = (char*)fix_heap(arr, num - border, size, greater);
 		border++;
 	}
 
-	return numbers;
+	return arr;
 }
 
 void free_matrixes(matrix* matrixes, int number)
@@ -172,18 +208,6 @@ matrix* allocate_matrix(int size)
 	}
 
 	return result;
-}
-
-void print_matrix(matrix matrix)
-{
-	for (int i = 0; i < matrix.size; i++)
-	{
-		for (int j = 0; j < matrix.size; j++)
-		{
-			printf("%d ", matrix.data[i][j]);
-		}
-		printf("\n");
-	}
 }
 
 void print_matrix_1(int** matrix, int size)
@@ -250,7 +274,7 @@ int det(int **M, int size)
 
 	for (int i = 0; i < size; i++)
 	{
-		result = result +  (-1)*(-1 + 2 * (i % 2)) * M[0][i] * det(delete_row_and_column(M, tmp_matrix, 0, i, size), size - 1);
+		result = result + (-1)*(-1 + 2 * (i % 2)) * M[0][i] * det(delete_row_and_column(M, tmp_matrix, 0, i, size), size - 1);
 	}
 
 	for (int i = 0; i < size - 1; i++)
@@ -266,7 +290,7 @@ int det(int **M, int size)
 matrix *read_matrixes(FILE *input, int size)
 {
 	matrix *matrixes = (matrix*)calloc(size, sizeof(matrix));
-	
+
 	if (!matrixes)
 	{
 		printf("Can't allocate memore for matrixes");
@@ -302,11 +326,6 @@ matrix *read_matrixes(FILE *input, int size)
 	return matrixes;
 }
 
-int greater(matrix one, matrix two)
-{
-	return one.det > two.det;
-}
-
 int main()
 {
 	int size;
@@ -322,6 +341,7 @@ int main()
 
 	fscanf(input, "%d", &size);
 	matrixes = read_matrixes(input, size);
+	fclose(input);
 
 	if (!matrixes)
 	{
@@ -335,7 +355,22 @@ int main()
 		//printf("det: %d\n", det(matrixes[i].data, matrixes[i].size));
 	}
 
-	fclose(input);
+	matrixes = (matrix*)sort(matrixes, size, sizeof(matrix), greater);
+
+	output = fopen("output.txt", "w");
+
+	if (!output)
+	{
+		printf("Can't open output.txt");
+		return -1;
+	}
+	
+	for (int i = 0; i < size; i++)
+	{
+		print_matrix(output, &matrixes[i]);
+	}
+
+	fclose(output);
 
 	free_matrixes(matrixes, size);
 	return 0;
