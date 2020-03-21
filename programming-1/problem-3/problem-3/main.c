@@ -3,6 +3,18 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+void swap(void *a, void *b, size_t size)
+{
+	size_t __size = (size);
+	char *__a = (char*)(a), *__b = (char*)(b), __tmp;
+	do
+	{
+		__tmp = *__a;
+		*__a++ = *__b;
+		*__b++ = __tmp;
+	} while (--__size > 0);
+}
+
 typedef struct matrix {
 	short size;
 	short det;
@@ -15,17 +27,6 @@ int greater(void* one, void* two)
 	matrix* one_tmp = (matrix*)one;
 	matrix* two_tmp = (matrix*)two;
 	return one_tmp->det - two_tmp->det;
-}
-
-void swap(void *first, void *second)
-{
-	unsigned long long t = *(unsigned long long *)(first);
-	*(unsigned long long *)(first) = *(unsigned long long *)(second);
-	*(unsigned long long *)(second) = t;
-
-	//	void *tmp = *first;
-	//	*first = *second;
-	//	*second = tmp;
 }
 
 void print_matrix(FILE *file, matrix *matrix)
@@ -59,7 +60,7 @@ void *make_heap(void *base, size_t num, size_t size, int(*compar)(void*, void*))
 			}
 			else
 			{
-				swap(arr + index * size, arr + parent * size);
+				swap(arr + index * size, arr + parent * size, size);
 				//print_matrix(arr + index * size);
 				//print_matrix(arr + parent * size);
 				index = parent;
@@ -92,7 +93,7 @@ void *fix_heap(void *base, size_t num, size_t size, int(*compar)(void*, void*))
 		{
 			if (compar(arr + child_1 * size, arr + index * size) > 0)
 			{
-				swap(arr + child_1*size, arr + index*size);
+				swap(arr + child_1*size, arr + index*size, size);
 				index = child_1;
 			}
 			else
@@ -102,11 +103,11 @@ void *fix_heap(void *base, size_t num, size_t size, int(*compar)(void*, void*))
 		}
 		else
 		{
-			if (compar(arr + child_2*size , arr + child_1*size) >= 0)
+			if (compar(arr + child_2*size, arr + child_1*size) >= 0)
 			{
 				if (compar(arr + child_2*size, arr + index*size) > 0)
 				{
-					swap(arr + child_2*size, arr + index*size);
+					swap(arr + child_2*size, arr + index*size, size);
 					index = child_2;
 				}
 				else
@@ -118,7 +119,7 @@ void *fix_heap(void *base, size_t num, size_t size, int(*compar)(void*, void*))
 			{
 				if (compar(arr + child_1 * size, arr + index * size) > 0)
 				{
-					swap(arr + child_1*size, arr + index*size);
+					swap(arr + child_1*size, arr + index*size, size);
 					index = child_1;
 				}
 				else
@@ -146,7 +147,7 @@ void *sort(void *base, size_t num, size_t size, int(*compar)(void*, void*))
 
 	for (i = 0; i < num - 1; i++)
 	{
-		swap(arr, arr + (num - border) * size);
+		swap(arr, arr + (num - border) * size, size);
 		//print_matrix(arr);
 		//print_matrix(arr + (num - border) * size);
 		arr = (char*)fix_heap(arr, num - border, size, greater);
@@ -364,7 +365,7 @@ int main()
 		printf("Can't open output.txt");
 		return -1;
 	}
-	
+
 	for (int i = 0; i < size; i++)
 	{
 		print_matrix(output, &matrixes[i]);
