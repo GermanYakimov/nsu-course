@@ -18,10 +18,36 @@
     <ClCompile Include="main.c">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="comparator.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bubble_sort.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="swap.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="heap_sort.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="matrix.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt">
       <Filter>Resource Files</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="comparator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sorts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="matrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

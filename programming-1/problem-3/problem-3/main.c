@@ -2,6 +2,7 @@
 
 #include<stdio.h>
 #include<stdlib.h>
+#include "sorts.h"
 
 typedef struct matrix {
 	short size;
@@ -9,19 +10,7 @@ typedef struct matrix {
 	int **data;
 } matrix;
 
-void swap(void *first, void *second, size_t size)
-{
-	size_t _size = size;
-	char *_first = (char*)first, *_second = (char*)second, _tmp;
-	do
-	{
-		_tmp = *_first;
-		*_first++ = *_second;
-		*_second++ = _tmp;
-	} while (--_size > 0);
-}
-
-int greater(void* one, void* two)
+int greater_det(void* one, void* two)
 {
 	matrix* one_tmp = (matrix*)one;
 	matrix* two_tmp = (matrix*)two;
@@ -45,7 +34,7 @@ void *make_heap(void *base, size_t num, size_t size, int(*compar)(void*, void*))
 	int i, index, parent;
 	char *arr = (char*)base;
 
-	for (i = 0; i < num; i++)
+	for (i = 0; i < (int)num; i++)
 	{
 		index = i;
 
@@ -53,7 +42,7 @@ void *make_heap(void *base, size_t num, size_t size, int(*compar)(void*, void*))
 		{
 			parent = (index - 1) / 2;
 
-			if (0 <= parent <= num && compar(arr + index * size, arr + parent * size) <= 0)
+			if (0 <= parent <= (int)num && compar(arr + index * size, arr + parent * size) <= 0)
 			{
 				break;
 			}
@@ -79,8 +68,8 @@ void *fix_heap(void *base, size_t num, size_t size, int(*compar)(void*, void*))
 		child_1 = 2 * index + 1;
 		child_2 = 2 * index + 2;
 
-		cond_1 = child_1 >= num;
-		cond_2 = child_2 >= num;
+		cond_1 = child_1 >= (int)num;
+		cond_2 = child_2 >= (int)num;
 
 		if (cond_1 && cond_2)
 		{
@@ -130,17 +119,17 @@ void *fix_heap(void *base, size_t num, size_t size, int(*compar)(void*, void*))
 	return arr;
 }
 
-void *sort(void *base, size_t num, size_t size, int(*compar)(void*, void*))
+void *heap_sort(void *base, size_t num, size_t size, int(*compar)(void*, void*))
 {
 	int i, heap_start = 0, border = 1;
 	char *arr = (char*)base;
 
-	arr = (char*)make_heap(base, num, size, greater);
+	arr = (char*)make_heap(base, num, size, greater_det);
 
-	for (i = 0; i < num - 1; i++)
+	for (i = 0; i < (int)(num - 1); i++)
 	{
 		swap(arr, arr + (num - border) * size, size);
-		arr = (char*)fix_heap(arr, num - border, size, greater);
+		arr = (char*)fix_heap(arr, num - border, size, greater_det);
 		border++;
 	}
 
@@ -207,18 +196,6 @@ matrix* allocate_matrix(int size)
 	}
 
 	return result;
-}
-
-void print_matrix_1(int** matrix, int size)
-{
-	for (int i = 0; i < size; i++)
-	{
-		for (int j = 0; j < size; j++)
-		{
-			printf("%d ", matrix[i][j]);
-		}
-		printf("\n");
-	}
 }
 
 matrix *additional_matrix(matrix *M, matrix *result, int row, int column)
@@ -354,7 +331,7 @@ int main()
 		}
 	}
 
-	matrixes = (matrix*)sort(matrixes, size, sizeof(matrix), greater);
+	matrixes = (matrix*)heap_sort(matrixes, size, sizeof(matrix), greater_det);
 
 	output = fopen("output.txt", "w");
 

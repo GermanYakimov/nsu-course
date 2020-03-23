@@ -139,10 +139,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="comparator.c" />
+    <ClCompile Include="heap_sort.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="bubble_sort.c" />
+    <ClCompile Include="matrix.c" />
+    <ClCompile Include="swap.c" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="comparator.h" />
+    <ClInclude Include="matrix.h" />
+    <ClInclude Include="sorts.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
