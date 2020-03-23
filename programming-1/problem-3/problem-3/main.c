@@ -3,6 +3,12 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+typedef struct matrix {
+	short size;
+	long det;
+	int **data;
+} matrix;
+
 void swap(void *first, void *second, size_t size)
 {
 	size_t _size = size;
@@ -14,13 +20,6 @@ void swap(void *first, void *second, size_t size)
 		*_second++ = _tmp;
 	} while (--_size > 0);
 }
-
-typedef struct matrix {
-	short size;
-	long det;
-	int **data;
-} matrix;
-
 
 int greater(void* one, void* two)
 {
