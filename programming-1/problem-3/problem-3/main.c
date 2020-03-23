@@ -17,7 +17,7 @@ void swap(void *first, void *second, size_t size)
 
 typedef struct matrix {
 	short size;
-	short det;
+	long det;
 	int **data;
 } matrix;
 
@@ -61,8 +61,6 @@ void *make_heap(void *base, size_t num, size_t size, int(*compar)(void*, void*))
 			else
 			{
 				swap(arr + index * size, arr + parent * size, size);
-				//print_matrix(arr + index * size);
-				//print_matrix(arr + parent * size);
 				index = parent;
 			}
 		}
@@ -140,21 +138,33 @@ void *sort(void *base, size_t num, size_t size, int(*compar)(void*, void*))
 
 	arr = (char*)make_heap(base, num, size, greater);
 
-	//for (int i = 0; i < num; i++)
-	//{
-	//	print_matrix(arr + i*size);
-	//}
-
 	for (i = 0; i < num - 1; i++)
 	{
 		swap(arr, arr + (num - border) * size, size);
-		//print_matrix(arr);
-		//print_matrix(arr + (num - border) * size);
 		arr = (char*)fix_heap(arr, num - border, size, greater);
 		border++;
 	}
 
 	return arr;
+}
+
+void free_matrix(matrix* M)
+{
+	if (M->data)
+	{
+		for (int j = 0; j < M->size; j++)
+		{
+			if (M->data[j])
+			{
+				free(M->data[j]);
+			}
+			else
+			{
+				break;
+			}
+		}
+		free(M->data);
+	}
 }
 
 void free_matrixes(matrix* matrixes, int number)
@@ -163,18 +173,7 @@ void free_matrixes(matrix* matrixes, int number)
 	{
 		if (matrixes[i].data)
 		{
-			for (int j = 0; j < matrixes[i].size; j++)
-			{
-				if (matrixes[i].data[j])
-				{
-					free(matrixes[i].data[j]);
-				}
-				else
-				{
-					break;
-				}
-			}
-			free(matrixes[i].data);
+			free_matrix(matrixes + i);
 		}
 		else
 		{
@@ -223,11 +222,11 @@ void print_matrix_1(int** matrix, int size)
 	}
 }
 
-int **delete_row_and_column(int **M, int **result, int row, int column, int size)
+matrix *additional_matrix(matrix *M, matrix *result, int row, int column)
 {
 	int tmp_i = 0, tmp_j = 0;
 
-	for (int i = 0; i < size; i++)
+	for (int i = 0; i < M->size; i++)
 	{
 		if (i == row)
 		{
@@ -235,13 +234,13 @@ int **delete_row_and_column(int **M, int **result, int row, int column, int size
 		}
 		tmp_j = 0;
 
-		for (int j = 0; j < size; j++)
+		for (int j = 0; j < M->size; j++)
 		{
 			if (j == column)
 			{
 				continue;
 			}
-			result[tmp_i][tmp_j] = M[i][j];
+			result->data[tmp_i][tmp_j] = M->data[i][j];
 			tmp_j++;
 		}
 
@@ -249,41 +248,37 @@ int **delete_row_and_column(int **M, int **result, int row, int column, int size
 
 	}
 
-	//print_matrix_1(result, size - 1);
 	return result;
 }
 
-int det(int **M, int size)
+long det(matrix *M)
 {
-	if (size == 1)
+	if (M->size == 1)
 	{
-		return M[0][0];
+		return M->data[0][0];
 	}
 
-	if (size == 2)
+	if (M->size == 2)
 	{
-		return M[0][0] * M[1][1] - M[1][0] * M[0][1];
+		return M->data[0][0] * M->data[1][1] - M->data[1][0] * M->data[0][1];
 	}
 
 	int result = 0;
-	int **tmp_matrix = (int**)calloc(size - 1, sizeof(int*));
 
-	for (int i = 0; i < size - 1; i++)
+	matrix *tmp_matrix = allocate_matrix(M->size - 1);
+
+	if (!tmp_matrix)
 	{
-		tmp_matrix[i] = (int*)malloc((size - 1) * sizeof(int));
+		printf("Can't allocate memory for additional matrix");
+		return LONG_MAX;
 	}
 
-	for (int i = 0; i < size; i++)
+	for (int i = 0; i < M->size; i++)
 	{
-		result = result + (-1)*(-1 + 2 * (i % 2)) * M[0][i] * det(delete_row_and_column(M, tmp_matrix, 0, i, size), size - 1);
+		result = result + (-1)*(-1 + 2 * (i % 2)) * M->data[0][i] * det(additional_matrix(M, tmp_matrix, 0, i));
 	}
 
-	for (int i = 0; i < size - 1; i++)
-	{
-		free(tmp_matrix[i]);
-	}
-
-	free(tmp_matrix);
+	free_matrix(tmp_matrix);
 
 	return result;
 }
@@ -312,6 +307,7 @@ matrix *read_matrixes(FILE *input, int size)
 			free_matrixes(matrixes, size);
 			return NULL;
 		}
+
 		matrixes[i] = *tmp;
 		free(tmp);
 
@@ -351,9 +347,12 @@ int main()
 
 	for (int i = 0; i < size; i++)
 	{
-		//print_matrix(matrixes[i]);
-		matrixes[i].det = det(matrixes[i].data, matrixes[i].size);
-		//printf("det: %d\n", det(matrixes[i].data, matrixes[i].size));
+		matrixes[i].det = det(matrixes + i);
+
+		if (matrixes[i].det == LONG_MAX)
+		{
+			return -1;
+		}
 	}
 
 	matrixes = (matrix*)sort(matrixes, size, sizeof(matrix), greater);
