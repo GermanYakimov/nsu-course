@@ -153,6 +153,7 @@
     <ClInclude Include="comparator.h" />
     <ClInclude Include="matrix.h" />
     <ClInclude Include="sorts.h" />
+    <ClInclude Include="swap.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
