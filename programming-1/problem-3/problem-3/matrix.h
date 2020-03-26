@@ -16,3 +16,5 @@ matrix *additional_matrix(matrix *M, matrix *result, int row, int column);
 long det(matrix *M);
 matrix *read_matrixes(FILE *input, int size);
 int greater_det(void* one, void* two);
+void print_matrixes(FILE *file, matrix *matrixes, int number);
+matrix *count_matrixes_dets(matrix *matrixes, int num);

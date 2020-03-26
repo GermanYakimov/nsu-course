@@ -33,6 +33,9 @@
     <ClCompile Include="matrix.c">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="input_generator.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt">
@@ -50,6 +53,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="swap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="input_generator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

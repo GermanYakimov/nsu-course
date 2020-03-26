@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdlib.h>
 #include <stdio.h>
 #include "matrix.h"
@@ -49,6 +51,16 @@ matrix *read_matrixes(FILE *input, int size)
 	return matrixes;
 }
 
+matrix *count_matrixes_dets(matrix *matrixes, int num)
+{
+	for (int i = 0; i < num; i++)
+	{
+		matrixes[i].det = det(matrixes + i);
+	}
+
+	return matrixes;
+}
+
 long det(matrix *M)
 {
 	if (M->size == 1)
@@ -77,6 +89,7 @@ long det(matrix *M)
 	}
 
 	free_matrix(tmp_matrix);
+	free(tmp_matrix);
 
 	return result;
 }
@@ -113,6 +126,12 @@ matrix *additional_matrix(matrix *M, matrix *result, int row, int column)
 matrix* allocate_matrix(int size)
 {
 	matrix *result = (matrix*)malloc(sizeof(matrix));
+	if (!result)
+	{
+		printf("Can't alocate memory for matrix");
+		return NULL;
+	}
+
 	result->size = size;
 
 	result->data = (int**)calloc(size, sizeof(int*));
@@ -155,6 +174,8 @@ void free_matrixes(matrix* matrixes, int number)
 
 void print_matrix(FILE *file, matrix *matrix)
 {
+	fprintf(file, "\n");
+
 	for (int i = 0; i < matrix->size; i++)
 	{
 		for (int j = 0; j < matrix->size; j++)
@@ -162,6 +183,14 @@ void print_matrix(FILE *file, matrix *matrix)
 			fprintf(file, "%d ", matrix->data[i][j]);
 		}
 		fprintf(file, "\n");
+	}
+}
+
+void print_matrixes(FILE *file, matrix *matrixes, int number)
+{
+	for (int i = 0; i < number; i++)
+	{
+		print_matrix(file, matrixes + i);
 	}
 }
 
