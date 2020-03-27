@@ -15,7 +15,8 @@ void run_benchmark()
 	matrix *matrixes;
 
 	short max_matrix_size;
-	int size, upper_limit, calls_num;
+	int upper_limit;
+	size_t calls_number, size;
 	char filename[256];
 	char generate_random_input, sort;
 
@@ -28,8 +29,8 @@ void run_benchmark()
 
 	if (generate_random_input == 'y')
 	{
-		printf("matrix count: ");
-		scanf("%d", &size);
+		printf("matrix number: ");
+		scanf("%lu", &size);
 		printf("upper limit: ");
 		scanf("%d", &upper_limit);
 		printf("max matrix size: ");
@@ -44,7 +45,7 @@ void run_benchmark()
 			return;
 		}
 
-		fprintf(input_backup, "%d\n", size);
+		fprintf(input_backup, "%lu\n", size);
 		print_matrixes(input_backup, matrixes, size);
 		fclose(input_backup);
 
@@ -63,7 +64,7 @@ void run_benchmark()
 			if (filename[0] == 'm')
 			{
 				printf("enter matrix number: ");
-				scanf("%d", &size);
+				scanf("%lu", &size);
 				printf("then enter the matrixes:\n");
 				matrixes = read_matrixes(stdin, size);
 
@@ -82,7 +83,7 @@ void run_benchmark()
 					return;
 				}
 
-				fscanf(last_input, "%d", &size);
+				fscanf(last_input, "%lu", &size);
 
 				matrixes = read_matrixes(last_input, size);
 
@@ -105,7 +106,7 @@ void run_benchmark()
 				return;
 			}
 
-			fscanf(input, "%d", &size);
+			fscanf(input, "%lu", &size);
 
 			matrixes = read_matrixes(input, size);
 			fclose(input);
@@ -113,9 +114,9 @@ void run_benchmark()
 	}
 
 	printf("calls number: ");
-	scanf("%d", &calls_num);
+	scanf("%lu", &calls_number);
 
-	result = benchmark(sort, calls_num, matrixes, size, sizeof(matrix), greater_det, count_matrixes_dets);
+	result = benchmark(sort, calls_number, matrixes, size, sizeof(matrix), greater_det, count_matrixes_dets);
 	print_benchmark_result(stdout, result);
 
 	free_matrixes(matrixes, size);

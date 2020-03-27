@@ -6,11 +6,11 @@
 #include "matrix.h"
 #include "sorts.h"
 
-double count_average(double *runtime, int num)
+double count_average(double *runtime, size_t num)
 {
 	double sum = 0;
 
-	for (int i = 0; i < num; i++)
+	for (size_t i = 0; i < num; i++)
 	{
 		sum += runtime[i];
 	}
@@ -18,11 +18,11 @@ double count_average(double *runtime, int num)
 	return sum / num;
 }
 
-double count_standard_dev_1(double *runtime, double average, int num)
+double count_standard_dev_1(double *runtime, double average, size_t num)
 {
 	double result = 0;
 
-	for (int i = 0; i < num; i++)
+	for (size_t i = 0; i < num; i++)
 	{
 		result += (runtime[i] - average) * (runtime[i] - average);
 	}
@@ -30,11 +30,11 @@ double count_standard_dev_1(double *runtime, double average, int num)
 	return sqrt(result / num);
 }
 
-double count_standard_dev_2(double *runtime, double average, int num)
+double count_standard_dev_2(double *runtime, double average, size_t num)
 {
 	double result = 0;
 
-	for (int i = 0; i < num; i++)
+	for (size_t i = 0; i < num; i++)
 	{
 		result += (runtime[i] - average) * (runtime[i] - average);
 	}
@@ -42,7 +42,7 @@ double count_standard_dev_2(double *runtime, double average, int num)
 	return sqrt(result / (num - 1));
 }
 
-double *run_sort(char sort, int calls_number, void *base, size_t num, size_t size, int(*compar)(void*, void*), void*(*prepare_data)(void*, int))
+double *run_sort(char sort, size_t calls_number, void *base, size_t num, size_t size, int(*compar)(void*, void*), void*(*prepare_data)(void*, int))
 {
 	void *base_copy = malloc(num*size);
 
@@ -66,7 +66,7 @@ double *run_sort(char sort, int calls_number, void *base, size_t num, size_t siz
 	switch (sort)
 	{
 	case 'h':
-		for (int i = 0; i < calls_number; i++)
+		for (size_t i = 0; i < calls_number; i++)
 		{
 			time = clock();
 			base_copy = prepare_data(base_copy, num);
@@ -79,7 +79,7 @@ double *run_sort(char sort, int calls_number, void *base, size_t num, size_t siz
 		}
 		break;
 	case 'b':
-		for (int i = 0; i < calls_number; i++)
+		for (size_t i = 0; i < calls_number; i++)
 		{
 			time = clock();
 			base_copy = prepare_data(base_copy, num);
@@ -98,11 +98,11 @@ double *run_sort(char sort, int calls_number, void *base, size_t num, size_t siz
 	return results;
 }
 
-int find_worst_run(double *runtime, int num)
+size_t find_worst_run(double *runtime, size_t num)
 {
-	int max_index = 0;
+	size_t max_index = 0;
 
-	for (int i = 1; i < num; i++)
+	for (size_t i = 1; i < num; i++)
 	{
 		if (runtime[i] > runtime[max_index])
 		{
@@ -113,11 +113,11 @@ int find_worst_run(double *runtime, int num)
 	return max_index;
 }
 
-int find_best_run(double *runtime, int num)
+size_t find_best_run(double *runtime, size_t num)
 {
-	int min_index = 0;
+	size_t min_index = 0;
 
-	for (int i = 1; i < num; i++)
+	for (size_t i = 1; i < num; i++)
 	{
 		if (runtime[i] < runtime[min_index])
 		{
@@ -128,7 +128,7 @@ int find_best_run(double *runtime, int num)
 	return min_index;
 }
 
-benchmark_res benchmark(char sort, int calls_number, void *base, size_t num, size_t size, int(*compar)(void*, void*), void*(*prepare_data)(void*, int))
+benchmark_res benchmark(char sort, size_t calls_number, void *base, size_t num, size_t size, int(*compar)(void*, void*), void*(*prepare_data)(void*, int))
 {
 	benchmark_res result;
 	result.data_size = num;
@@ -150,7 +150,7 @@ void print_benchmark_result(FILE *file, benchmark_res result)
 {
 	fprintf(file, "algorithm: %c\n", result.algorithm);
 
-	for (int i = 0; i < result.calls_number; i++)
+	for (size_t i = 0; i < result.calls_number; i++)
 	{
 		fprintf(file, "run %d: %lf\n", i, result.runtime[i]);
 	}
