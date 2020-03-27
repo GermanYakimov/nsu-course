@@ -1,110 +1,101 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "sorts.h"
 #include "matrix.h"
 #include "comparator.h"
 #include "input_generator.h"
 
-int main()
+void run_benchmark()
 {
-	srand(time(0));
-
-	int size, upper_limit, max_matrix_size, calls_num;
-	double *results;
-	printf("matrix count: ");
-	scanf("%d", &size);
-	printf("upper limit: ");
-	scanf("%d", &upper_limit);
-	printf("max matrix size: ");
-	scanf("%d", &max_matrix_size);
-	printf("calls count: ");
-	scanf("%d", &calls_num);
-
-	matrix *matrixes = generate_matrix_array(max_matrix_size, upper_limit, size);
-
-	if (!matrixes)
-	{
-		return -1;
-	}
-
-	results = run_sort('h', calls_num, matrixes, size, sizeof(matrix), greater_det, count_matrixes_dets);
-
-	//print_matrixes(stdout, matrixes, size);
-
-	//for (int i = 0; i < calls_num; i++)
-	//{
-	//	printf("%lf\n", results[i]);
-	//}
-	free(results);
-
-	//printf("\n");
-
-	//for (int i = 0; i < size; i++)
-	//{
-	//	matrixes[i].det = det(matrixes + i);
-
-	//	if (matrixes[i].det == LONG_MAX)
-	//	{
-	//		return -1;
-	//	}
-	//}
-
-	//matrixes = (matrix*)heap_sort(matrixes, size, sizeof(matrix), greater_det);
-
-	//print_matrixes(stdout, matrixes, size);
-	/*int size;
+	benchmark_res result;
 	matrix *matrixes;
-	FILE *input, *output;
-	input = fopen("input.txt", "r");
 
-	if (!input)
+	short max_matrix_size;
+	int size, upper_limit, calls_num;
+	char filename[256];
+	char generate_random_input, sort;
+
+	printf("select the algorithm: ");
+	getchar();
+	scanf("%c", &sort);
+	printf("generate random input (y/n)? ");
+	getchar();
+	scanf("%c", &generate_random_input);
+
+	if (generate_random_input == 'y')
 	{
-		printf("Can't open input.txt");
-		return -1;
-	}
+		printf("matrix count: ");
+		scanf("%d", &size);
+		printf("upper limit: ");
+		scanf("%d", &upper_limit);
+		printf("max matrix size: ");
+		scanf("%hi", &max_matrix_size);
 
-	fscanf(input, "%d", &size);
-	matrixes = read_matrixes(input, size);
-	fclose(input);
+		matrixes = generate_matrix_array(max_matrix_size, upper_limit, size);
 
-	if (!matrixes)
-	{
-		return -1;
-	}
-
-	for (int i = 0; i < size; i++)
-	{
-		matrixes[i].det = det(matrixes + i);
-
-		if (matrixes[i].det == LONG_MAX)
+		if (!matrixes)
 		{
-			return -1;
+			return;
+		}
+	}
+	else if (generate_random_input == 'n')
+	{
+		printf("enter filename (if you want to enter data manually, type 'm'): ");
+		scanf("%s", filename);
+
+		if (strlen(filename) == 1 && filename[0] == 'm')
+		{
+			scanf("%d", &size);
+			matrixes = read_matrixes(stdin, size);
+
+			if (!matrixes)
+			{
+				return;
+			}
+		}
+		else
+		{
+			FILE *input = fopen(filename, "r");
+
+			if (!input)
+			{
+				printf("Can't open %s", filename);
+				return;
+			}
+
+			fscanf(input, "%d", &size);
+			matrixes = read_matrixes(input, size);
 		}
 	}
 
-	matrixes = (matrix*)heap_sort(matrixes, size, sizeof(matrix), greater_det);
-	
-	double time = sorting_time(matrixes, size, sizeof(matrix), greater_det, heap_sort);
-	printf("%lf\n", time);
+	printf("calls number: ");
+	scanf("%d", &calls_num);
 
-	output = fopen("output.txt", "w");
-
-	if (!output)
-	{
-		printf("Can't open output.txt");
-		return -1;
-	}
-
-	for (int i = 0; i < size; i++)
-	{
-		print_matrix(output, &matrixes[i]);
-	}
-
-	fclose(output);*/
+	result = benchmark(sort, calls_num, matrixes, size, sizeof(matrix), greater_det, count_matrixes_dets);
+	print_benchmark_result(stdout, result);
 
 	free_matrixes(matrixes, size);
+	free_benchmark_result(result);
+}
+
+int main()
+{
+	srand(time(0));
+	char option;
+
+	printf("select an option(b - benchmark test): ");
+	scanf("%c", &option);
+
+	switch (option)
+	{
+	case 'b':
+		run_benchmark();
+		break;
+	}
+
 	return 0;
 }
