@@ -36,6 +36,17 @@ void run_benchmark()
 		scanf("%hi", &max_matrix_size);
 
 		matrixes = generate_matrix_array(max_matrix_size, upper_limit, size);
+		FILE *input_backup = fopen("last_generated_input.txt", "w");
+
+		if (!input_backup)
+		{
+			printf("Can't backup generated input");
+			return;
+		}
+
+		fprintf(input_backup, "%d\n", size);
+		print_matrixes(input_backup, matrixes, size);
+		fclose(input_backup);
 
 		if (!matrixes)
 		{
@@ -44,17 +55,44 @@ void run_benchmark()
 	}
 	else if (generate_random_input == 'n')
 	{
-		printf("enter filename (if you want to enter data manually, type 'm'): ");
+		printf("enter filename (to enter data manually type m, to use last generated input type l): ");
 		scanf("%s", filename);
 
-		if (strlen(filename) == 1 && filename[0] == 'm')
+		if (strlen(filename) == 1)
 		{
-			scanf("%d", &size);
-			matrixes = read_matrixes(stdin, size);
-
-			if (!matrixes)
+			if (filename[0] == 'm')
 			{
-				return;
+				printf("enter matrix number: ");
+				scanf("%d", &size);
+				printf("then enter the matrixes:\n");
+				matrixes = read_matrixes(stdin, size);
+
+				if (!matrixes)
+				{
+					return;
+				}
+			}
+			else if (filename[0] == 'l')
+			{
+				FILE *last_input = fopen("last_generated_input.txt", "r");
+
+				if (!last_input)
+				{
+					printf("Can't find file with input (last_generated_input.txt)");
+					return;
+				}
+
+				fscanf(last_input, "%d", &size);
+
+				matrixes = read_matrixes(last_input, size);
+
+				if (!matrixes)
+				{
+					fclose(last_input);
+					return;
+				}
+
+				fclose(last_input);
 			}
 		}
 		else
@@ -68,7 +106,9 @@ void run_benchmark()
 			}
 
 			fscanf(input, "%d", &size);
+
 			matrixes = read_matrixes(input, size);
+			fclose(input);
 		}
 	}
 

@@ -174,8 +174,6 @@ void free_matrixes(matrix* matrixes, int number)
 
 void print_matrix(FILE *file, matrix *matrix)
 {
-	fprintf(file, "\n");
-
 	for (int i = 0; i < matrix->size; i++)
 	{
 		for (int j = 0; j < matrix->size; j++)
@@ -190,6 +188,7 @@ void print_matrixes(FILE *file, matrix *matrixes, int number)
 {
 	for (int i = 0; i < number; i++)
 	{
+		fprintf(file, "%d\n", (matrixes + i)->size);
 		print_matrix(file, matrixes + i);
 	}
 }
