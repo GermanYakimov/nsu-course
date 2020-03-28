@@ -36,6 +36,15 @@
     <ClCompile Include="input_generator.c">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="selection_sort.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="quick_sort.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="merge_sort.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt">

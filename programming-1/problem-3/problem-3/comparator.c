@@ -91,6 +91,19 @@ double *run_sort(char sort, size_t calls_number, void *base, size_t num, size_t 
 			base_copy = memcpy(base_copy, base, num*size);
 		}
 		break;
+	case 'q':
+		for (size_t i = 0; i < calls_number; i++)
+		{
+			time = clock();
+			base_copy = prepare_data(base_copy, num);
+			base_copy = quick_sort(base_copy, num, size, compar);
+			time = clock() - time;
+
+			results[i] = (double)time;
+
+			base_copy = memcpy(base_copy, base, num*size);
+		}
+		break;
 	}
 
 	free(base_copy);

@@ -123,6 +123,20 @@ void run_benchmark()
 	free_benchmark_result(result);
 }
 
+int greater(int *a, int *b)
+{
+	return *a - *b;
+}
+
+void print(int *arr)
+{
+	for (int i = 0; i < 1000; i++)
+	{
+		printf("%d ", arr[i]);
+	}
+	printf("\n");
+}
+
 int main()
 {
 	srand(time(0));
