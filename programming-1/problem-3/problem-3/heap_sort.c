@@ -2,7 +2,7 @@
 #include "sorts.h"
 #include "swap.h"
 
-void *make_heap(void *base, size_t num, size_t size, int(*compare)(void*, void*))
+void *make_heap(void *base, size_t num, size_t size, double(*compare)(void*, void*))
 {
 	int i, index, parent;
 	char *arr = (char*)base;
@@ -30,7 +30,7 @@ void *make_heap(void *base, size_t num, size_t size, int(*compare)(void*, void*)
 	return arr;
 }
 
-void *fix_heap(void *base, size_t num, size_t size, int(*compare)(void*, void*))
+void *fix_heap(void *base, size_t num, size_t size, double(*compare)(void*, void*))
 {
 	int index = 0, child_1, child_2;
 	_Bool cond_1, cond_2;
@@ -90,7 +90,7 @@ void *fix_heap(void *base, size_t num, size_t size, int(*compare)(void*, void*))
 	}
 }
 
-void *heap_sort(void *base, size_t num, size_t size, int(*compare)(void*, void*))
+void *heap_sort(void *base, size_t num, size_t size, double(*compare)(void*, void*))
 {
 	int i, heap_start = 0, border = 1;
 	char *arr = (char*)base;

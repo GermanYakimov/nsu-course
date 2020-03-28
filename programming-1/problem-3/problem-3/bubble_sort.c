@@ -1,7 +1,7 @@
 #include "swap.h"
 #include "sorts.h"
 
-void *bubble_sort(void *base, size_t num, size_t size, int(*compare)(void*, void*))
+void *bubble_sort(void *base, size_t num, size_t size, double(*compare)(void*, void*))
 {
 	char *arr = (char*)base;
 	int swaps_counter = 1;

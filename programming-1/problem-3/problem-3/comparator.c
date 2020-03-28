@@ -42,7 +42,7 @@ double count_standard_dev_2(double *runtime, double average, size_t num)
 	return sqrt(result / (num - 1));
 }
 
-double *run_sort(char sort, size_t calls_number, void *base, size_t num, size_t size, int(*compar)(void*, void*), void*(*prepare_data)(void*, int))
+double *run_sort(char sort, size_t calls_number, void *base, size_t num, size_t size, double(*compar)(void*, void*), void*(*prepare_data)(void*, int))
 {
 	void *base_copy = malloc(num*size);
 
@@ -76,6 +76,7 @@ double *run_sort(char sort, size_t calls_number, void *base, size_t num, size_t 
 			results[i] = (double)time;
 
 			base_copy = memcpy(base_copy, base, num*size);
+
 		}
 		break;
 	case 'b':
@@ -141,7 +142,7 @@ size_t find_best_run(double *runtime, size_t num)
 	return min_index;
 }
 
-benchmark_res benchmark(char sort, size_t calls_number, void *base, size_t num, size_t size, int(*compar)(void*, void*), void*(*prepare_data)(void*, int))
+benchmark_res benchmark(char sort, size_t calls_number, void *base, size_t num, size_t size, double(*compar)(void*, void*), void*(*prepare_data)(void*, int))
 {
 	benchmark_res result;
 	result.data_size = num;

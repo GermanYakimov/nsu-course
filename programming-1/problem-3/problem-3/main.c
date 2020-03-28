@@ -9,6 +9,8 @@
 #include "comparator.h"
 #include "input_generator.h"
 
+#pragma comment(linker, "/STACK:100000000000")
+
 void run_benchmark()
 {
 	benchmark_res result;
@@ -121,20 +123,6 @@ void run_benchmark()
 
 	free_matrixes(matrixes, size);
 	free_benchmark_result(result);
-}
-
-int greater(int *a, int *b)
-{
-	return *a - *b;
-}
-
-void print(int *arr)
-{
-	for (int i = 0; i < 1000; i++)
-	{
-		printf("%d ", arr[i]);
-	}
-	printf("\n");
 }
 
 int main()
