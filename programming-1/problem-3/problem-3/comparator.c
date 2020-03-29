@@ -42,7 +42,12 @@ double count_standard_dev_2(double *runtime, double average, size_t num)
 	return sqrt(result / (num - 1));
 }
 
-double *run_sort(char sort, size_t calls_number, void *base, size_t num, size_t size, double(*compar)(void*, void*), void*(*prepare_data)(void*, int))
+double *run(size_t calls_number, void *base, size_t num, size_t size, void*(*algorithm)(void*, size_t, size_t, double(void*, void*)))
+{
+	
+}
+
+double *run_sort(char sort, size_t calls_number, void *base, size_t num, size_t size, double(*compar)(void*, void*), void*(*prepare_data)(void*, size_t))
 {
 	void *base_copy = malloc(num*size);
 

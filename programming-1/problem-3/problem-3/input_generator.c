@@ -1,5 +1,7 @@
-#include<stdlib.h>
+#include <stdlib.h>
 #include <time.h>
+#include <math.h>
+
 #include "matrix.h"
 
 matrix *generate_matrix(short max_size, int upper_limit)
@@ -17,19 +19,19 @@ matrix *generate_matrix(short max_size, int upper_limit)
 	{
 		for (short j = 0; j < size; j++)
 		{
-			result->data[i][j] = rand() % upper_limit;
+			result->data[i][j] = (int)(pow(-1.0, (rand() % 2) / 1.0)) * rand() % upper_limit;
 		}
 	}
 
 	return result;
 }
 
-matrix *generate_matrix_array(short max_size, int upper_limit, int num)
+matrix *generate_matrix_array(short max_size, int upper_limit, size_t num)
 {
 	matrix *result = (matrix*)malloc(num * sizeof(matrix));
 	matrix *tmp;
 
-	for (int i = 0; i < num; i++)
+	for (size_t i = 0; i < num; i++)
 	{
 		tmp = generate_matrix(max_size, upper_limit);
 
@@ -45,3 +47,14 @@ matrix *generate_matrix_array(short max_size, int upper_limit, int num)
 	return result;
 }
 
+int *generate_numbers_array(int upper_limit, size_t num)
+{
+	int *result = (int*)malloc(num * sizeof(int));
+
+	for (size_t i = 0; i < num; i++)
+	{
+		result[i] = (int)(pow(-1.0, (rand() % 2) / 1.0)) * rand() % upper_limit;
+	}
+
+	return result;
+}
