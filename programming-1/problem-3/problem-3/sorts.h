@@ -1,10 +1,14 @@
 #pragma once
-#include<stdlib.h>
 
-void *bubble_sort(void *base, size_t num, size_t size, double(*compare)(void*, void*));
+#include <stdlib.h>
 
-void *make_heap(void *base, size_t num, size_t size, double(*compare)(void*, void*));
-void *fix_heap(void *base, size_t num, size_t size, double(*compare)(void*, void*));
-void *heap_sort(void *base, size_t num, size_t size, double(*compare)(void*, void*));
+typedef struct input_data_for_sort {
+	void *base;
+	size_t num;
+	size_t size;
+	double(*compare)(void*, void*);
+} sort_input;
 
-void *quick_sort(void *base, size_t num, size_t size, double(*compare)(void*, void*));
+void *bubble_sort(void *data);
+void *heap_sort(void *data);
+void *quick_sort(void *data);

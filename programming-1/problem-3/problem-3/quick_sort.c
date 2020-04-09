@@ -42,9 +42,10 @@ void _q_sort(void *start, size_t left, size_t right, size_t size, double(*compar
 	}
 }
 
-void *quick_sort(void *base, size_t num, size_t size, double(*compare)(void*, void*))
+void *quick_sort(void *data)
 {
-	_q_sort(base, 0, num - 1, size, compare);
+	sort_input *input = (sort_input*)data;
+	_q_sort(input->base, 0, input->num - 1, input->size, input->compare);
 
-	return base;
+	return data;
 }

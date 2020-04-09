@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <time.h>
 #include <string.h>
 #include <math.h>
@@ -42,22 +44,18 @@ double count_standard_dev_2(double *runtime, double average, size_t num)
 	return sqrt(result / (num - 1));
 }
 
-double *run(size_t calls_number, void *base, size_t num, size_t size, void*(*algorithm)(void*, size_t, size_t, double(void*, void*)))
+double *run_algorithm(size_t calls_number, void *input, void*(*algorithm)(void*), void*(*read)(FILE*, void*), char* filename)
 {
-	
-}
+	//void *base_copy = malloc(num*size);
 
-double *run_sort(char sort, size_t calls_number, void *base, size_t num, size_t size, double(*compar)(void*, void*), void*(*prepare_data)(void*, size_t))
-{
-	void *base_copy = malloc(num*size);
-
-	if (!base_copy)
-	{
-		printf("Can't allocate memory for the copy of input.");
-		return NULL;
-	}
+	//if (!base_copy)
+	//{
+	//	printf("Can't allocate memory for the copy of input.");
+	//	return NULL;
+	//}
 
 	double *results = (double*)malloc(calls_number * sizeof(double));
+	FILE *backup;
 
 	if (!results)
 	{
@@ -65,54 +63,70 @@ double *run_sort(char sort, size_t calls_number, void *base, size_t num, size_t 
 		return NULL;
 	}
 
-	base_copy = memcpy(base_copy, base, num*size);
+	//base_copy = memcpy(base_copy, base, num*size);
 	clock_t time;
 
-	switch (sort)
+	for (size_t i = 0; i < calls_number; i++)
 	{
-	case 'h':
-		for (size_t i = 0; i < calls_number; i++)
+		backup = fopen(filename, "r");
+
+		if (!backup)
 		{
-			time = clock();
-			base_copy = prepare_data(base_copy, num);
-			base_copy = heap_sort(base_copy, num, size, compar);
-			time = clock() - time;
-
-			results[i] = (double)time;
-
-			base_copy = memcpy(base_copy, base, num*size);
-
+			printf("Can't open backup file");
+			return NULL;
 		}
-		break;
-	case 'b':
-		for (size_t i = 0; i < calls_number; i++)
-		{
-			time = clock();
-			base_copy = prepare_data(base_copy, num);
-			base_copy = bubble_sort(base_copy, num, size, compar);
-			time = clock() - time;
 
-			results[i] = (double)time;
+		input = read(backup, input);
+		fclose(backup);
 
-			base_copy = memcpy(base_copy, base, num*size);
-		}
-		break;
-	case 'q':
-		for (size_t i = 0; i < calls_number; i++)
-		{
-			time = clock();
-			base_copy = prepare_data(base_copy, num);
-			base_copy = quick_sort(base_copy, num, size, compar);
-			time = clock() - time;
+		time = clock();
+		algorithm(input);
+		time = clock() - time;
 
-			results[i] = (double)time;
-
-			base_copy = memcpy(base_copy, base, num*size);
-		}
-		break;
+		results[i] = (double)time;
 	}
 
-	free(base_copy);
+	//switch (sort)
+	//{
+	//case 'h':
+	//	for (size_t i = 0; i < calls_number; i++)
+	//	{
+	//		time = clock();
+	//		base_copy = heap_sort(base_copy, num, size, compar);
+	//		time = clock() - time;
+
+	//		results[i] = (double)time;
+
+	//		base_copy = memcpy(base_copy, base, num*size);
+
+	//	}
+	//	break;
+	//case 'b':
+	//	for (size_t i = 0; i < calls_number; i++)
+	//	{
+	//		time = clock();
+	//		base_copy = bubble_sort(base_copy, num, size, compar);
+	//		time = clock() - time;
+
+	//		results[i] = (double)time;
+
+	//		base_copy = memcpy(base_copy, base, num*size);
+	//	}
+	//	break;
+	//case 'q':
+	//	for (size_t i = 0; i < calls_number; i++)
+	//	{
+	//		time = clock();
+	//		base_copy = quick_sort(base_copy, num, size, compar);
+	//		time = clock() - time;
+
+	//		results[i] = (double)time;
+
+	//		base_copy = memcpy(base_copy, base, num*size);
+	//	}
+	//	break;
+	//}
+
 
 	return results;
 }
@@ -147,14 +161,12 @@ size_t find_best_run(double *runtime, size_t num)
 	return min_index;
 }
 
-benchmark_res benchmark(char sort, size_t calls_number, void *base, size_t num, size_t size, double(*compar)(void*, void*), void*(*prepare_data)(void*, int))
+benchmark_res benchmark(size_t calls_number, void *input, void*(*algorithm)(void*), void*(*read)(FILE*, void*), char *filename)
 {
 	benchmark_res result;
-	result.data_size = num;
-	result.algorithm = sort;
 	result.calls_number = calls_number;
 
-	result.runtime = run_sort(sort, calls_number, base, num, size, compar, prepare_data);
+	result.runtime = run_algorithm(calls_number, input, algorithm, read, filename);
 	result.average_time = count_average(result.runtime, calls_number);
 	result.standard_dev_1 = count_standard_dev_1(result.runtime, result.average_time, calls_number);
 	result.standard_dev_2 = count_standard_dev_2(result.runtime, result.average_time, calls_number);
@@ -167,8 +179,6 @@ benchmark_res benchmark(char sort, size_t calls_number, void *base, size_t num, 
 
 void print_benchmark_result(FILE *file, benchmark_res result)
 {
-	fprintf(file, "algorithm: %c\n", result.algorithm);
-
 	for (size_t i = 0; i < result.calls_number; i++)
 	{
 		fprintf(file, "run %d: %lf\n", i, result.runtime[i]);

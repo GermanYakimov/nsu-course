@@ -1,24 +1,26 @@
 #include "swap.h"
 #include "sorts.h"
 
-void *bubble_sort(void *base, size_t num, size_t size, double(*compare)(void*, void*))
+void *bubble_sort(void *data)
 {
-	char *arr = (char*)base;
+	sort_input *input = (sort_input*)data;
+
+	char *arr = (char*)input->base;
 	int swaps_counter = 1;
 
 	while (swaps_counter)
 	{
 		swaps_counter = 0;
 
-		for (int i = 0; i < (int)(num - 1); i++)
+		for (int i = 0; i < (int)(input->num - 1); i++)
 		{
-			if (compare(arr + i*size, arr + (i + 1)*size) > 0)
+			if (input->compare(arr + i*input->size, arr + (i + 1)*input->size) > 0)
 			{
-				swap(arr + i*size, arr + (i + 1)*size, size);
+				swap(arr + i*input->size, arr + (i + 1)*input->size, input->size);
 				swaps_counter++;
 			}
 		}
 	}
 
-	return arr;
+	return data;
 }

@@ -6,18 +6,17 @@
 
 matrix *generate_matrix(short max_size, int upper_limit)
 {
-	short size = 1 + rand() % max_size;
-
-	matrix *result = allocate_matrix(size);
+	matrix *result = allocate_matrix(max_size);
+	result->size = 1 + rand() % max_size;
 
 	if (!result)
 	{
 		return NULL;
 	}
 
-	for (short i = 0; i < size; i++)
+	for (size_t i = 0; i < result->size; i++)
 	{
-		for (short j = 0; j < size; j++)
+		for (size_t j = 0; j < result->size; j++)
 		{
 			result->data[i][j] = (int)(pow(-1.0, (rand() % 2) / 1.0)) * rand() % upper_limit;
 		}

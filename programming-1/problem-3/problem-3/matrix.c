@@ -4,8 +4,12 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+
 #include "matrix.h"
 #include "swap.h"
+#include "comparator.h"
+#include "input_generator.h"
+#include "sorts.h"
 
 double greater_det(void* one, void* two)
 {
@@ -14,13 +18,13 @@ double greater_det(void* one, void* two)
 	return one_tmp->det - two_tmp->det;
 }
 
-matrix *read_matrixes(FILE *input, size_t size)
+matrix *read_matrixes(FILE *input, size_t size, size_t max_order)
 {
 	matrix *matrixes = (matrix*)calloc(size, sizeof(matrix));
 
 	if (!matrixes)
 	{
-		printf("Can't allocate memore for matrixes");
+		printf("Can't allocate memory for matrixes");
 		return NULL;
 	}
 
@@ -31,7 +35,8 @@ matrix *read_matrixes(FILE *input, size_t size)
 	for (size_t i = 0; i < size; i++)
 	{
 		fscanf(input, "%lu", &order);
-		tmp = allocate_matrix(order);
+		tmp = allocate_matrix(max_order);
+		tmp->size = order;
 
 		if (!tmp)
 		{
@@ -52,6 +57,177 @@ matrix *read_matrixes(FILE *input, size_t size)
 	}
 
 	return matrixes;
+}
+
+void *load_matrixes(FILE *input, sort_input *data)
+{
+	size_t size, order;
+	fscanf(input, "%lu %lu", &size, &order);
+	matrix *matrixes = (matrix*)data->base;
+
+	for (size_t i = 0; i < size; i++)
+	{
+		fscanf(input, "%lu", &order);
+
+		for (size_t j = 0; j < order; j++)
+		{
+			for (size_t k = 0; k < order; k++)
+			{
+				fscanf(input, "%lf", (&matrixes[i].data[j][k]));
+			}
+		}
+
+		fscanf(input, "%lf", &matrixes[i].det);
+	}
+
+	return data;
+}
+
+void run_matrixes_sort_benchmark()
+{
+	benchmark_res result;
+	matrix *matrixes;
+
+	sort_input input;
+	input.compare = greater_det;
+	input.size = sizeof(matrix);
+
+	int upper_limit;
+	size_t calls_number, size, max_order;
+	char filename[256];
+	char generate_random_input, sort;
+
+	printf("select the algorithm: ");
+	getchar();
+	scanf("%c", &sort);
+	printf("generate random input (y/n)? ");
+	getchar();
+	scanf("%c", &generate_random_input);
+
+	if (generate_random_input == 'y')
+	{
+		printf("matrix number: ");
+		scanf("%lu", &size);
+		printf("upper limit: ");
+		scanf("%d", &upper_limit);
+		printf("max matrix size: ");
+		scanf("%lu", &max_order);
+
+		matrixes = generate_matrix_array(max_order, upper_limit, size);
+		FILE *input_backup = fopen("last_generated_input.txt", "w");
+
+		if (!input_backup)
+		{
+			printf("Can't backup generated input");
+			return;
+		}
+
+		print_matrixes(input_backup, matrixes, size, 0, max_order);
+		fclose(input_backup);
+
+		if (!matrixes)
+		{
+			return;
+		}
+	}
+	else if (generate_random_input == 'n')
+	{
+		printf("filename (to enter data manually type m, to use last generated input type l): ");
+		scanf("%s", filename);
+
+		if (strlen(filename) == 1)
+		{
+			if (filename[0] == 'm')
+			{
+				printf("matrix number: ");
+				scanf("%lu", &size);
+				printf("max matrix order: ");
+				scanf("%lu", &max_order);
+				printf("then enter the matrixes:\n");
+				matrixes = read_matrixes(stdin, size, max_order);
+
+				if (!matrixes)
+				{
+					return;
+				}
+			}
+			else if (filename[0] == 'l')
+			{
+				FILE *last_input = fopen("last_generated_input.txt", "r");
+
+				if (!last_input)
+				{
+					printf("Can't find file with input (last_generated_input.txt)");
+					return;
+				}
+
+				fscanf(last_input, "%lu %lu", &size, &max_order);
+
+				matrixes = read_matrixes(last_input, size, max_order);
+
+				if (!matrixes)
+				{
+					fclose(last_input);
+					return;
+				}
+
+				fclose(last_input);
+			}
+		}
+		else
+		{
+			FILE *input = fopen(filename, "r");
+
+			if (!input)
+			{
+				printf("Can't open %s", filename);
+				return;
+			}
+
+			fscanf(input, "%lu %lu", &size, &max_order);
+
+			matrixes = read_matrixes(input, size, max_order);
+			fclose(input);
+		}
+	}
+
+	printf("calls number: ");
+	scanf("%lu", &calls_number);
+
+	count_matrixes_dets(matrixes, size);
+
+	input.num = size;
+	input.base = matrixes;
+
+	char backup_filename[64] = "backup.txt";
+	FILE *backup = fopen("backup.txt", "w");
+	if (!backup)
+	{
+		printf("Can't open file for matrixes backup");
+		return;
+	}
+
+	print_matrixes(backup, matrixes, size, 1, max_order);
+	fclose(backup);
+
+	switch (sort)
+	{
+	case 'b':
+		result = benchmark(calls_number, &input, bubble_sort, load_matrixes, backup_filename);
+		break;
+	case 'h':
+		result = benchmark(calls_number, &input, heap_sort, load_matrixes, backup_filename);
+		break;
+	case 'q':
+		result = benchmark(calls_number, &input, quick_sort, load_matrixes, backup_filename);
+		break;
+	default:
+		break;
+	}
+	print_benchmark_result(stdout, result);
+
+	//free_matrixes(matrixes, size);
+	free_benchmark_result(result);
 }
 
 matrix *copy_matrix(matrix *M)
@@ -217,7 +393,7 @@ matrix* allocate_matrix(size_t size)
 	matrix *result = (matrix*)malloc(sizeof(matrix));
 	if (!result)
 	{
-		printf("Can't alocate memory for matrix");
+		printf("403: Can't alocate memory for matrix");
 		return NULL;
 	}
 
@@ -226,7 +402,7 @@ matrix* allocate_matrix(size_t size)
 	result->data = (double**)calloc(size, sizeof(double*));
 	if (!result->data)
 	{
-		printf("Can't allocate memory for matrix");
+		printf("412: Can't allocate memory for matrix");
 		return NULL;
 	}
 
@@ -236,7 +412,7 @@ matrix* allocate_matrix(size_t size)
 
 		if (!result->data[i])
 		{
-			printf("Can't allocate memory for matrix");
+			printf("422: Can't allocate memory for matrix");
 			return NULL;
 		}
 	}
@@ -261,24 +437,30 @@ void free_matrixes(matrix* matrixes, size_t number)
 	free(matrixes);
 }
 
-void print_matrix(FILE *file, matrix *matrix)
+void print_matrix(FILE *file, matrix *matrix, _Bool with_det)
 {
 	for (size_t i = 0; i < matrix->size; i++)
 	{
 		for (size_t j = 0; j < matrix->size; j++)
 		{
-			fprintf(file, "%3.3lf ", matrix->data[i][j]);
+			fprintf(file, "%lf ", matrix->data[i][j]);
 		}
 		fprintf(file, "\n");
 	}
+
+	if(with_det)
+	{
+		fprintf(file, "%lf\n", matrix->det);
+	}
 }
 
-void print_matrixes(FILE *file, matrix *matrixes, size_t number)
+void print_matrixes(FILE *file, matrix *matrixes, size_t number, _Bool with_dets, size_t max_order)
 {
+	fprintf(file, "%lu %lu\n", number, max_order);
 	for (size_t i = 0; i < number; i++)
 	{
 		fprintf(file, "%d\n", (matrixes + i)->size);
-		print_matrix(file, matrixes + i);
+		print_matrix(file, matrixes + i, with_dets);
 	}
 }
 

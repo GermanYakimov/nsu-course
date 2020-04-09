@@ -4,8 +4,6 @@
 #include <stdio.h>
 
 typedef struct benchmark_result {
-	char algorithm;
-	size_t data_size;
 	size_t calls_number;
 	size_t best_run;
 	size_t worst_run;
@@ -16,10 +14,10 @@ typedef struct benchmark_result {
 } benchmark_res;
 
 double count_average(double *runtime, size_t num);
-double *run_sort(char sort, size_t calls_number, void *base, size_t num, size_t size, double(*compar)(void*, void*), void*(*prepare_data)(void*, size_t));
+double *run_algorithm(size_t calls_number, void *input, void*(*algorithm)(void*), void*(*read)(FILE*, void*), char* filename);
 double count_standard_dev_1(double *runtime, double average, size_t num);
 double count_standard_dev_2(double *runtime, double average, size_t num);
-benchmark_res benchmark(char sort, size_t calls_number, void *base, size_t num, size_t size, double(*compar)(void*, void*), void*(*prepare_data)(void*, int));
+benchmark_res benchmark(size_t calls_number, void *input, void*(*algorithm)(void*), void*(*read)(FILE*, void*), char *filename);
 void free_benchmark_result(benchmark_res result);
 void print_benchmark_result(FILE *file, benchmark_res result);
 size_t find_best_run(double *runtime, size_t num);
