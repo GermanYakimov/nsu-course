@@ -46,14 +46,6 @@ double count_standard_dev_2(double *runtime, double average, size_t num)
 
 double *run_algorithm(size_t calls_number, void *input, void*(*algorithm)(void*), void*(*read)(FILE*, void*), char* filename)
 {
-	//void *base_copy = malloc(num*size);
-
-	//if (!base_copy)
-	//{
-	//	printf("Can't allocate memory for the copy of input.");
-	//	return NULL;
-	//}
-
 	double *results = (double*)malloc(calls_number * sizeof(double));
 	FILE *backup;
 
@@ -63,11 +55,16 @@ double *run_algorithm(size_t calls_number, void *input, void*(*algorithm)(void*)
 		return NULL;
 	}
 
-	//base_copy = memcpy(base_copy, base, num*size);
 	clock_t time;
 
 	for (size_t i = 0; i < calls_number; i++)
 	{
+		time = clock();
+		algorithm(input);
+		time = clock() - time;
+
+		results[i] = (double)time;
+
 		backup = fopen(filename, "r");
 
 		if (!backup)
@@ -78,55 +75,7 @@ double *run_algorithm(size_t calls_number, void *input, void*(*algorithm)(void*)
 
 		input = read(backup, input);
 		fclose(backup);
-
-		time = clock();
-		algorithm(input);
-		time = clock() - time;
-
-		results[i] = (double)time;
 	}
-
-	//switch (sort)
-	//{
-	//case 'h':
-	//	for (size_t i = 0; i < calls_number; i++)
-	//	{
-	//		time = clock();
-	//		base_copy = heap_sort(base_copy, num, size, compar);
-	//		time = clock() - time;
-
-	//		results[i] = (double)time;
-
-	//		base_copy = memcpy(base_copy, base, num*size);
-
-	//	}
-	//	break;
-	//case 'b':
-	//	for (size_t i = 0; i < calls_number; i++)
-	//	{
-	//		time = clock();
-	//		base_copy = bubble_sort(base_copy, num, size, compar);
-	//		time = clock() - time;
-
-	//		results[i] = (double)time;
-
-	//		base_copy = memcpy(base_copy, base, num*size);
-	//	}
-	//	break;
-	//case 'q':
-	//	for (size_t i = 0; i < calls_number; i++)
-	//	{
-	//		time = clock();
-	//		base_copy = quick_sort(base_copy, num, size, compar);
-	//		time = clock() - time;
-
-	//		results[i] = (double)time;
-
-	//		base_copy = memcpy(base_copy, base, num*size);
-	//	}
-	//	break;
-	//}
-
 
 	return results;
 }

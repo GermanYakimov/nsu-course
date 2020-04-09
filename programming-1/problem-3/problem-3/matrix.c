@@ -239,7 +239,7 @@ matrix *copy_matrix(matrix *M)
 		printf("Can't copy matrix");
 		return NULL;
 	}
-	
+
 	for (size_t i = 0; i < M->size; i++)
 	{
 		for (size_t j = 0; j < M->size; j++)
@@ -263,7 +263,7 @@ matrix *count_matrixes_dets(matrix *matrixes, size_t num)
 
 double det(matrix *M)
 {
-	
+
 	if (M->size == 1)
 	{
 		return M->data[0][0];
@@ -448,7 +448,7 @@ void print_matrix(FILE *file, matrix *matrix, _Bool with_det)
 		fprintf(file, "\n");
 	}
 
-	if(with_det)
+	if (with_det)
 	{
 		fprintf(file, "%lf\n", matrix->det);
 	}
