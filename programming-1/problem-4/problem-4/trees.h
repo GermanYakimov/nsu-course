@@ -20,7 +20,7 @@ typedef struct AVL_node_ {
 } node;
 
 
-node *remove_AVL(node *root, char *key, size_t size, int compare(void*, void*));
+node *remove_AVL(node *root, void *key, size_t size, int compare(void*, void*));
 
 node *insert_AVL(node *root, void *key, size_t size, int compare(void*, void*));
 

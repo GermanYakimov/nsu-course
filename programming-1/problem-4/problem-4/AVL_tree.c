@@ -8,7 +8,7 @@
 node *_new_node(void *key, size_t size)
 {
 	node *result = (node*)malloc(sizeof(node));
-	result->height = 0;
+	result->height = 1;
 	result->left = NULL;
 	result->right = NULL;
 	result->key = malloc(size);
@@ -35,7 +35,7 @@ void _fix_height(node *tree_node)
 		return;
 	}
 
-	tree_node->height = _height(tree_node->left) + _height(tree_node->right) + 1;
+	tree_node->height = max(_height(tree_node->left), _height(tree_node->right)) + 1;
 }
 
 short _balance_factor(node *tree_node)
@@ -45,7 +45,7 @@ short _balance_factor(node *tree_node)
 		return 0;
 	}
 
-	return (short)((int)_height(tree_node->right) - (int)_height(tree_node->left) + 1);
+	return (short)((int)_height(tree_node->right) - (int)_height(tree_node->left));
 }
 
 node *_rotate_right_AVL(node *tree_node)
@@ -157,7 +157,7 @@ void print_tree(node *root, void print(void*))
 	}
 }
 
-node *remove_AVL(node *root, char *key, size_t size, int compare(void*, void*))
+node *remove_AVL(node *root, void *key, size_t size, int compare(void*, void*))
 {
 	if (!is_in_tree_AVL(root, key, compare))
 	{
@@ -167,10 +167,12 @@ node *remove_AVL(node *root, char *key, size_t size, int compare(void*, void*))
 	if (compare(key, root->key) < 0)
 	{
 		root->left = remove_AVL(root->left, key, size, compare);
+		_fix_height(root->left);
 	}
 	else if (compare(key, root->key) > 0)
 	{
 		root->right = remove_AVL(root->right, key, size, compare);
+		_fix_height(root->right);
 	}
 	else
 	{
@@ -196,6 +198,7 @@ node *remove_AVL(node *root, char *key, size_t size, int compare(void*, void*))
 		if (min == right_child)
 		{
 			right_child->left = left_child;
+			_fix_height(right_child);
 			return _rebalance_AVL(right_child);
 		}
 
@@ -204,11 +207,16 @@ node *remove_AVL(node *root, char *key, size_t size, int compare(void*, void*))
 		new_root->right = right_child;
 
 		min_prev->left = NULL;
+		_fix_height(min_prev);
 		free(min);
 
 		_fix_height(new_root);
+
 		return _rebalance_AVL(new_root);
 	}
+
+	_fix_height(root);
+	return _rebalance_AVL(root);
 }
 
 node *insert_AVL(node *root, void *key, size_t size, int compare(void*, void*))

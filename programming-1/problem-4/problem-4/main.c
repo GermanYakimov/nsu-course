@@ -29,6 +29,21 @@ int main()
 
 		root = insert_AVL(root, &tmp, sizeof(int), greater);
 		print_tree(root, print);
+		printf("\nheight: %lu", root->height);
+		printf("\n");
+	}
+
+	printf("numbers to remove count: ");
+	scanf("%d", &num);
+
+	for (int i = 0; i < num; i++)
+	{
+		printf("value: ");
+		scanf("%d", &tmp);
+
+		root = remove_AVL(root, &tmp, sizeof(int), greater);
+		print_tree(root, print);
+		printf("\nheight: %lu", root->height);
 		printf("\n");
 	}
 
