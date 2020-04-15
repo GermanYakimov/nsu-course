@@ -119,6 +119,12 @@ node *_rebalance_AVL(node *tree_node)
 	return tree_node;
 }
 
+void _free_node(node *tree_node)
+{
+	free(tree_node->key);
+	free(tree_node);
+}
+
 int is_in_tree_AVL(node *root, void *key, int compare(void*, void*))
 {
 	if (!root)
@@ -157,6 +163,29 @@ void print_tree(node *root, void print(void*))
 	}
 }
 
+void print_data_on_level(node *root, int level, void print(void*))
+{
+	if (level == 0)
+	{
+		print(root->key);
+		printf(" ");
+		return;
+	}
+
+	print_data_on_level(root->left, level - 1, print);
+	print_data_on_level(root->right, level - 1, print);
+}
+
+int nodes_number(node *root)
+{
+	if (!root)
+	{
+		return 0;
+	}
+
+	return 1 + nodes_number(root->right) + nodes_number(root->left);
+}
+
 node *remove_AVL(node *root, void *key, size_t size, int compare(void*, void*))
 {
 	if (!is_in_tree_AVL(root, key, compare))
@@ -179,7 +208,7 @@ node *remove_AVL(node *root, void *key, size_t size, int compare(void*, void*))
 		node *left_child = root->left;
 		node *right_child = root->right;
 
-		free(root);
+		_free_node(root);
 
 		if (!right_child)
 		{
@@ -208,7 +237,7 @@ node *remove_AVL(node *root, void *key, size_t size, int compare(void*, void*))
 
 		min_prev->left = NULL;
 		_fix_height(min_prev);
-		free(min);
+		_free_node(min);
 
 		_fix_height(new_root);
 
@@ -254,6 +283,5 @@ void delete_tree(node *root)
 	delete_tree(root->right);
 	delete_tree(root->left);
 
-	free(root->key);
-	free(root);
+	_free_node(root);
 }
