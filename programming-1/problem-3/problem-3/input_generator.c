@@ -4,7 +4,7 @@
 
 #include "matrix.h"
 
-matrix *generate_matrix(short max_size, int upper_limit)
+matrix *generate_matrix(size_t max_size, int upper_limit)
 {
 	matrix *result = allocate_matrix(max_size);
 	result->size = 1 + rand() % max_size;
@@ -25,7 +25,7 @@ matrix *generate_matrix(short max_size, int upper_limit)
 	return result;
 }
 
-matrix *generate_matrix_array(short max_size, int upper_limit, size_t num)
+matrix *generate_matrix_array(size_t max_size, int upper_limit, size_t num)
 {
 	matrix *result = (matrix*)malloc(num * sizeof(matrix));
 	matrix *tmp;
