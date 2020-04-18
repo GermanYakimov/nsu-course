@@ -27,10 +27,16 @@ int substr_count(char *str, char *substr)
 	return count;
 }
 
-node *add_words_to_tree(char *str, node *root)
+node_AVL *add_words_to_tree(char *str, node_AVL *root)
 {
 	int words_count = substr_count(str, " ") + 1;
 	char *p = str, *nearest_space, *tmp = (char*)malloc(words_count * sizeof(char));
+
+	if (!tmp)
+	{
+		printf("Can't allocate memory for temporary string");
+		return NULL;
+	}
 
 	for (int i = 0; i < words_count; i++)
 	{
@@ -43,6 +49,13 @@ node *add_words_to_tree(char *str, node *root)
 				p[strlen(p) - 1] = '\0';
 			}
 			root = insert_AVL(root, p, (strlen(p) + 1) * sizeof(char), strcmp);
+
+			if (!is_in_tree_AVL(root, p, strcmp))
+			{
+				printf("Can't insert node");
+				delete_tree(root);
+				return NULL;
+			}
 		}
 		else
 		{
@@ -54,6 +67,14 @@ node *add_words_to_tree(char *str, node *root)
 			}
 
 			root = insert_AVL(root, tmp, (strlen(tmp) + 1) * sizeof(char), strcmp);
+
+			if (!is_in_tree_AVL(root, tmp, strcmp))
+			{
+				printf("Can't insert node");
+				delete_tree(root);
+				return NULL;
+			}
+
 			p = nearest_space + 1;
 		}
 	}
@@ -61,11 +82,20 @@ node *add_words_to_tree(char *str, node *root)
 	return root;
 }
 
-node *delete_words_from_tree(char **words, size_t words_num, node *root)
+node_AVL *delete_words_from_tree(char **words, size_t words_num, node_AVL *root)
 {
+	size_t current_height;
+
 	for (size_t i = 0; i < words_num; i++)
 	{
+		current_height = root->_height;
 		root = remove_AVL(root, words[i], sizeof(words[i]), strcmp);
+
+		if (current_height - root->_height > 1)
+		{
+			printf("Can't remove node from tree");
+			return NULL;
+		}
 	}
 
 	return root;
@@ -82,6 +112,12 @@ char *read_str(FILE *in)
 
 	char *str = (char*)malloc(start_size * sizeof(char));
 
+	if (!str)
+	{
+		printf("Can't allocate memory for string");
+		return NULL;
+	}
+
 	while (1)
 	{
 		symbol = fgetc(in);
@@ -95,6 +131,13 @@ char *read_str(FILE *in)
 		if (current_size + 1 == current_max_size)
 		{
 			str = (char*)realloc(str, current_max_size + portion);
+
+			if (!str)
+			{
+				printf("Can't reallocate memory for string");
+				return NULL;
+			}
+
 			current_max_size += portion;
 		}
 
@@ -103,15 +146,9 @@ char *read_str(FILE *in)
 	}
 }
 
-int greater(int *a, int *b)
-{
-	return *a - *b;
-}
-
-
 int main()
 {
-	node *root = NULL;
+	node_AVL *root = NULL;
 
 	FILE *input = fopen("input.txt", "r");
 
@@ -121,7 +158,14 @@ int main()
 
 	int level, index = 0;
 	int words_count = substr_count(str, " ") + 1;
+
 	char **words_to_delete = (char**)malloc(words_count * sizeof(char*));
+
+	if (!words_to_delete)
+	{
+		printf("Can't allocate memory for words");
+		return -1;
+	}
 
 	while (1)
 	{
@@ -143,11 +187,18 @@ int main()
 	fclose(input);
 
 	root = add_words_to_tree(str, root);
+
+	if (!root)
+	{
+		return -1;
+	}
+
+	print_tree(root, print);
+
 	root = delete_words_from_tree(words_to_delete, index, root);
 	printf("%d\n", nodes_number(root));
 
 	print_data_on_level(root, level, print);
-	print_tree(root, print);
-	printf("\n");
+
 	delete_tree(root);
 }

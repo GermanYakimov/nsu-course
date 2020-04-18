@@ -5,66 +5,92 @@
 #include "trees.h"
 
 
-node *_new_node(void *key, size_t size)
+void _free_node(node_AVL *tree_node)
 {
-	node *result = (node*)malloc(sizeof(node));
-	result->height = 1;
-	result->left = NULL;
-	result->right = NULL;
+	if (tree_node && tree_node->key)
+	{
+		free(tree_node->key);
+		free(tree_node);
+	}
+	else if (tree_node)
+	{
+		free(tree_node);
+	}
+}
+
+node_AVL *_new_node(void *key, size_t size)
+{
+	node_AVL *result = (node_AVL*)malloc(sizeof(node_AVL));
+
+	if (!result)
+	{
+		printf("Can't allocate memory for new node");
+		return NULL;
+	}
+
+	result->_height = 1;
+	result->_left = NULL;
+	result->_right = NULL;
 	result->key = malloc(size);
+
+	if (!result->key)
+	{
+		printf("Can't allocate memory for node's key");
+		_free_node(result);
+		return NULL;
+	}
 
 	memcpy(result->key, key, size);
 
 	return result;
 }
 
-size_t _height(node *tree_node)
+size_t _height(node_AVL *tree_node)
 {
 	if (!tree_node)
 	{
 		return 0;
 	}
 
-	return tree_node->height;
+	return tree_node->_height;
 }
 
-void _fix_height(node *tree_node)
+void _fix_height(node_AVL *tree_node)
 {
 	if (!tree_node)
 	{
 		return;
 	}
 
-	tree_node->height = max(_height(tree_node->left), _height(tree_node->right)) + 1;
+	tree_node->_height = max(_height(tree_node->_left), _height(tree_node->_right)) + 1;
 }
 
-short _balance_factor(node *tree_node)
+short _balance_factor(node_AVL *tree_node)
 {
 	if (!tree_node)
 	{
 		return 0;
 	}
 
-	return (short)((int)_height(tree_node->right) - (int)_height(tree_node->left));
+	return (short)((int)_height(tree_node->_right) - (int)_height(tree_node->_left));
 }
 
-node *_rotate_right_AVL(node *tree_node)
+node_AVL *_rotate_right_AVL(node_AVL *tree_node)
 {
 	if (!tree_node)
 	{
-		return tree_node;
+		return NULL;
 	}
 
-	node *left_child = tree_node->left;
-
+	node_AVL *left_child = tree_node->_left;
 
 	if (!left_child)
 	{
 		return tree_node;
 	}
 
-	tree_node->left = left_child->right;
-	left_child->right = tree_node;
+	tree_node->_left = left_child->_right;
+	left_child->_right = tree_node;
 
 	_fix_height(tree_node);
 	_fix_height(left_child);
@@ -72,22 +98,22 @@ node *_rotate_right_AVL(node *tree_node)
 	return left_child;
 }
 
-node *_rotate_left_AVL(node *tree_node)
+node_AVL *_rotate_left_AVL(node_AVL *tree_node)
 {
 	if (!tree_node)
 	{
-		return tree_node;
+		return NULL;
 	}
 
-	node *right_child = tree_node->right;
+	node_AVL *right_child = tree_node->_right;
 
 	if (!right_child)
 	{
 		return tree_node;
 	}
 
-	tree_node->right = right_child->left;
-	right_child->left = tree_node;
+	tree_node->_right = right_child->_left;
+	right_child->_left = tree_node;
 
 	_fix_height(tree_node);
 	_fix_height(right_child);
@@ -95,22 +121,22 @@ node *_rotate_left_AVL(node *tree_node)
 	return right_child;
 }
 
-node *_rebalance_AVL(node *tree_node)
+node_AVL *_rebalance_AVL(node_AVL *tree_node)
 {
 	if (_balance_factor(tree_node) == 2)
 	{
-		if (_balance_factor(tree_node->right) < 0)
+		if (_balance_factor(tree_node->_right) < 0)
 		{
-			tree_node->right = _rotate_right_AVL(tree_node->right);
+			tree_node->_right = _rotate_right_AVL(tree_node->_right);
 		}
 		
 		return _rotate_left_AVL(tree_node);
 	}
 	else if (_balance_factor(tree_node) == -2)
 	{
-		if (_balance_factor(tree_node->left) < 0)
+		if (_balance_factor(tree_node->_left) < 0)
 		{
-			tree_node->left = _rotate_left_AVL(tree_node->left);
+			tree_node->_left = _rotate_left_AVL(tree_node->_left);
 		}
 
 		return _rotate_right_AVL(tree_node);
@@ -119,13 +145,7 @@ node *_rebalance_AVL(node *tree_node)
 	return tree_node;
 }
 
-void _free_node(node *tree_node)
-{
-	free(tree_node->key);
-	free(tree_node);
-}
-
-int is_in_tree_AVL(node *root, void *key, int compare(void*, void*))
+int is_in_tree_AVL(node_AVL *root, void *key, int compare(void*, void*))
 {
 	if (!root)
 	{
@@ -139,32 +159,37 @@ int is_in_tree_AVL(node *root, void *key, int compare(void*, void*))
 
 	if (compare(root->key, key) < 0)
 	{
-		return is_in_tree_AVL(root->right, key, compare);
+		return is_in_tree_AVL(root->_right, key, compare);
 	}
 	else
 	{
-		return is_in_tree_AVL(root->left, key, compare);
+		return is_in_tree_AVL(root->_left, key, compare);
 	}
 }
 
-void print_tree(node *root, void print(void*))
+
+void print_tree(node_AVL *root, void print(void*)) 
+{
+	if (!root) 
+	{
+		printf("x");
+		return;
+	}
+
+	printf("(");
+	print(root->key);
+	print_tree(root->_left, print);
+	print_tree(root->_right, print);
+	printf(")");
+}
+
+void print_data_on_level(node_AVL *root, int level, void print(void*))
 {
 	if (!root)
 	{
-		printf("x");
+		return;
 	}
-	else
-	{
-		print(root->key);
-		printf("(");
-		print_tree(root->left, print);
-		print_tree(root->right, print);
-		printf(")");
-	}
-}
 
-void print_data_on_level(node *root, int level, void print(void*))
-{
 	if (level == 0)
 	{
 		print(root->key);
@@ -172,21 +197,21 @@ void print_data_on_level(node *root, int level, void print(void*))
 		return;
 	}
 
-	print_data_on_level(root->left, level - 1, print);
-	print_data_on_level(root->right, level - 1, print);
+	print_data_on_level(root->_left, level - 1, print);
+	print_data_on_level(root->_right, level - 1, print);
 }
 
-int nodes_number(node *root)
+int nodes_number(node_AVL *root)
 {
 	if (!root)
 	{
 		return 0;
 	}
 
-	return 1 + nodes_number(root->right) + nodes_number(root->left);
+	return 1 + nodes_number(root->_right) + nodes_number(root->_left);
 }
 
-node *remove_AVL(node *root, void *key, size_t size, int compare(void*, void*))
+node_AVL *remove_AVL(node_AVL *root, void *key, size_t size, int compare(void*, void*))
 {
 	if (!is_in_tree_AVL(root, key, compare))
 	{
@@ -195,18 +220,18 @@ node *remove_AVL(node *root, void *key, size_t size, int compare(void*, void*))
 
 	if (compare(key, root->key) < 0)
 	{
-		root->left = remove_AVL(root->left, key, size, compare);
-		_fix_height(root->left);
+		root->_left = remove_AVL(root->_left, key, size, compare);
+		_fix_height(root->_left);
 	}
 	else if (compare(key, root->key) > 0)
 	{
-		root->right = remove_AVL(root->right, key, size, compare);
-		_fix_height(root->right);
+		root->_right = remove_AVL(root->_right, key, size, compare);
+		_fix_height(root->_right);
 	}
 	else
 	{
-		node *left_child = root->left;
-		node *right_child = root->right;
+		node_AVL *left_child = root->_left;
+		node_AVL *right_child = root->_right;
 
 		_free_node(root);
 
@@ -214,28 +239,37 @@ node *remove_AVL(node *root, void *key, size_t size, int compare(void*, void*))
 		{
 			return left_child;
 		}
-		node *min, *min_prev;
+		node_AVL *min, *min_prev;
 
 		min = right_child;
 
-		while (min->left)
+		while (min->_left)
 		{
 			min_prev = min;
-			min = min->left;
+			min = min->_left;
 		}
 
 		if (min == right_child)
 		{
-			right_child->left = left_child;
+			right_child->_left = left_child;
 			_fix_height(right_child);
 			return _rebalance_AVL(right_child);
 		}
 
-		node *new_root = _new_node(min->key, size);
-		new_root->left = left_child;
-		new_root->right = right_child;
+		node_AVL *new_root = _new_node(min->key, size);
 
-		min_prev->left = NULL;
+		if (!new_root)
+		{
+			printf("Can't allocate memory for new root");
+			delete_tree(left_child);
+			delete_tree(right_child);
+			return NULL;
+		}
+
+		new_root->_left = left_child;
+		new_root->_right = right_child;
+
+		min_prev->_left = NULL;
 		_fix_height(min_prev);
 		_free_node(min);
 
@@ -245,10 +279,11 @@ node *remove_AVL(node *root, void *key, size_t size, int compare(void*, void*))
 	}
 
 	_fix_height(root);
+
 	return _rebalance_AVL(root);
 }
 
-node *insert_AVL(node *root, void *key, size_t size, int compare(void*, void*))
+node_AVL *insert_AVL(node_AVL *root, void *key, size_t size, int compare(void*, void*))
 {
 	if (!root)
 	{
@@ -262,26 +297,27 @@ node *insert_AVL(node *root, void *key, size_t size, int compare(void*, void*))
 
 	if (compare(key, root->key) < 0)
 	{
-		root->left = insert_AVL(root->left, key, size, compare);
+		root->_left = insert_AVL(root->_left, key, size, compare);
 	}
 	else
 	{
-		root->right = insert_AVL(root->right, key, size, compare);
+		root->_right = insert_AVL(root->_right, key, size, compare);
 	}
 
 	_fix_height(root);
+
 	return _rebalance_AVL(root);
 }
 
-void delete_tree(node *root)
+void delete_tree(node_AVL *root)
 {
 	if (!root)
 	{
 		return;
 	}
 
-	delete_tree(root->right);
-	delete_tree(root->left);
+	delete_tree(root->_right);
+	delete_tree(root->_left);
 
 	_free_node(root);
 }

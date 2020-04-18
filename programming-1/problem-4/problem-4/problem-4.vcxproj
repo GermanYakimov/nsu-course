@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClCompile Include="AVL_tree.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="RB_tree.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="trees.h" />
