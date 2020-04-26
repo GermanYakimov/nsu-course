@@ -8,9 +8,9 @@
 #include "trees.h"
 
 
-void print(char *str)
+void print(char *str, FILE *file)
 {
-	printf("%s", str);
+	fprintf(file, "%s", str);
 }
 
 int substr_count(char *str, char *substr)
@@ -193,12 +193,25 @@ int main()
 		return -1;
 	}
 
-	print_tree(root, print);
+	FILE *output = fopen("output.txt", "w");
+	if (!output)
+	{
+		printf("Can't open output file");
+		delete_tree(root);
+		return -1;
+	}
+
+	print_tree(root, print, output);
+	fprintf(output, "\n");
 
 	root = delete_words_from_tree(words_to_delete, index, root);
-	printf("%d\n", nodes_number(root));
+	fprintf(output, "\n");
+	fprintf(output, "%d\n", nodes_number(root));
+	print_tree(root, print, output);
+	fprintf(output, "\n");
 
-	print_data_on_level(root, level, print);
+	print_data_on_level(root, level, print, output);
+	fprintf(output, "\n");
 
 	delete_tree(root);
 }

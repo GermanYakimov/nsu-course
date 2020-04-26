@@ -1,0 +1,52 @@
+#1
+TEXT:
+6 3 1 5 8 7 9 6 3 1
+DELETE:
+5
+8
+LEVEL:
+2
+
+#2
+TEXT:
+Animal law is a combination of statutory and case law in which the nature (legal, social or biological) of nonhuman animals is an important factor.
+DELETE:
+is
+animals
+combination
+law
+LEVEL:
+3
+
+#3
+TEXT:
+0 1 2 3 4 5 6 7 8 9
+DELETE:
+0
+2
+4
+6
+8
+LEVEL:
+2
+
+#4
+TEXT:
+People who live in glass houses should not throw stone.
+DELETE:
+stone
+people
+should
+LEVEL:
+1
+
+#5
+TEXT:
+In logic, a set of symbols is commonly used to express logical representation.
+DELETE:
+a
+of
+is
+to
+LEVEL:
+3

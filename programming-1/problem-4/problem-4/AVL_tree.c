@@ -168,22 +168,22 @@ int is_in_tree_AVL(node_AVL *root, void *key, int compare(void*, void*))
 }
 
 
-void print_tree(node_AVL *root, void print(void*)) 
+void print_tree(node_AVL *root, void print(void*, FILE*), FILE *file) 
 {
 	if (!root) 
 	{
-		printf("x");
+		fprintf(file, "x");
 		return;
 	}
 
-	printf("(");
-	print(root->key);
-	print_tree(root->_left, print);
-	print_tree(root->_right, print);
-	printf(")");
+	fprintf(file, "(");
+	print(root->key, file);
+	print_tree(root->_left, print, file);
+	print_tree(root->_right, print, file);
+	fprintf(file, ")");
 }
 
-void print_data_on_level(node_AVL *root, int level, void print(void*))
+void print_data_on_level(node_AVL *root, int level, void print(void*, FILE*), FILE *file)
 {
 	if (!root)
 	{
@@ -192,13 +192,13 @@ void print_data_on_level(node_AVL *root, int level, void print(void*))
 
 	if (level == 0)
 	{
-		print(root->key);
-		printf(" ");
+		print(root->key, file);
+		fprintf(file, " ");
 		return;
 	}
 
-	print_data_on_level(root->_left, level - 1, print);
-	print_data_on_level(root->_right, level - 1, print);
+	print_data_on_level(root->_left, level - 1, print, file);
+	print_data_on_level(root->_right, level - 1, print, file);
 }
 
 int nodes_number(node_AVL *root)
@@ -256,26 +256,16 @@ node_AVL *remove_AVL(node_AVL *root, void *key, size_t size, int compare(void*, 
 			return _rebalance_AVL(right_child);
 		}
 
-		node_AVL *new_root = _new_node(min->key, size);
-
-		if (!new_root)
-		{
-			printf("Can't allocate memory for new root");
-			delete_tree(left_child);
-			delete_tree(right_child);
-			return NULL;
-		}
-
-		new_root->_left = left_child;
-		new_root->_right = right_child;
-
 		min_prev->_left = NULL;
 		_fix_height(min_prev);
-		_free_node(min);
+		_fix_height(right_child);
+		_fix_height(left_child);
 
-		_fix_height(new_root);
+		min->_left = left_child;
+		min->_right = right_child;
+		_fix_height(min);
 
-		return _rebalance_AVL(new_root);
+		return _rebalance_AVL(min);
 	}
 
 	_fix_height(root);

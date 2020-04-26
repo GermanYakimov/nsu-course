@@ -21,9 +21,6 @@
     <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RB_tree.c">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="trees.h">
@@ -32,6 +29,9 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="tests.txt">
       <Filter>Source Files</Filter>
     </Text>
   </ItemGroup>

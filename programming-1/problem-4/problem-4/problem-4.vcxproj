@@ -141,13 +141,13 @@
   <ItemGroup>
     <ClCompile Include="AVL_tree.c" />
     <ClCompile Include="main.c" />
-    <ClCompile Include="RB_tree.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="trees.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />
+    <Text Include="tests.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
