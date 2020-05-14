@@ -23,6 +23,13 @@ typedef struct list_node_ {
 list_node *add_node(list_node *head, Node *to, int weight)
 {
 	list_node *new_node = (list_node*)malloc(sizeof(list_node));
+
+	if (!new_node)
+	{
+		printf("Can't allocate memory for new node.");
+		return NULL;
+	}
+
 	new_node->node = to;
 	new_node->weight = weight;
 	new_node->next = head;
@@ -55,105 +62,72 @@ void swap(Node **one, Node **two)
 	*two = tmp;
 }
 
-Node **make_heap(Node **arr, size_t num, int(*compare)(Node*, Node*))
+void swap_heap_nodes(Node **one, Node **two)
 {
-	int i, index, parent;
-
-	for (i = 0; i < (int)num; i++)
-	{
-		index = i;
-
-		while (index != 0)
-		{
-			parent = (index - 1) / 2;
-
-			if (0 <= parent <= (int)num && compare(arr[index], arr[parent]) <= 0)
-			{
-				break;
-			}
-			else
-			{
-				swap(arr + index, arr + parent);
-				arr[index]->heap_index = index;
-				arr[parent]->heap_index = parent;
-
-				index = parent;
-			}
-		}
-	}
-
-	return arr;
+	int one_index = (*one)->heap_index, two_index = (*two)->heap_index;
+	swap(one, two);
+	(*one)->heap_index = one_index;
+	(*two)->heap_index = two_index;
 }
 
-Node **fix_heap(Node **arr, size_t num, int(*compare)(Node*, Node*))
+Node **sift_down(Node **heap, int index, size_t size, int(*compare)(Node*, Node*))
 {
-	int index = 0, child_1, child_2;
+	int child_1, child_2;
 
 	while (1)
 	{
 		child_1 = 2 * index + 1;
 		child_2 = 2 * index + 2;
 
-		if (child_1 >= (int)num && child_2 >= (int)num)
+		if (child_1 >= (int)size && child_2 >= (int)size)
 		{
-			return arr;
+			return heap;
 		}
-		else if (child_2 >= (int)num)
+		else if (child_2 >= (int)size)
 		{
-			if (compare(arr[child_1], arr[index]) > 0)
+			if (compare(heap[child_1], heap[index]) > 0)
 			{
-				swap(arr + child_1, arr + index);
-				arr[child_1]->heap_index = child_1;
-				arr[index]->heap_index = index;
-
+				swap_heap_nodes(heap + child_1, heap + index);
 				index = child_1;
 			}
 			else
 			{
-				return arr;
+				return heap;
 			}
 		}
 		else
 		{
-			if (compare(arr[child_2], arr[child_1]) >= 0)
+			if (compare(heap[child_2], heap[child_1]) >= 0)
 			{
-				if (compare(arr[child_2], arr[index]) > 0)
+				if (compare(heap[child_2], heap[index]) > 0)
 				{
-					swap(arr + child_2, arr + index);
-					arr[child_2]->heap_index = child_2;
-					arr[index]->heap_index = index;
-
+					swap_heap_nodes(heap + child_2, heap + index);
 					index = child_2;
 				}
 				else
 				{
-					return arr;
+					return heap;
 				}
 			}
 			else
 			{
-				if (compare(arr[child_1], arr[index]) > 0)
+				if (compare(heap[child_1], heap[index]) > 0)
 				{
-					swap(arr + child_1, arr + index);
-					arr[child_1]->heap_index = child_1;
-					arr[index]->heap_index = index;
-
+					swap_heap_nodes(heap + child_1, heap + index);
 					index = child_1;
 				}
 				else
 				{
-					return arr;
+					return heap;
 				}
 			}
 		}
 	}
 }
 
-Node **decrease_key(Node *node, Node **heap, int key, int(*compare)(Node*, Node*))
+Node **sift_up(Node *node, Node **heap, int(*compare)(Node*, Node*))
 {
 	int node_index = node->heap_index, parent_index;
-	int tmp_1, tmp_2;
-	node->dist = key;
 	Node *parent;
 
 	while (1)
@@ -170,13 +144,7 @@ Node **decrease_key(Node *node, Node **heap, int key, int(*compare)(Node*, Node*
 
 		if (compare(node, parent) > 0)
 		{
-			tmp_1 = parent->heap_index;
-			tmp_2 = node->heap_index;
-
-			swap(heap + parent->heap_index, heap + node->heap_index);
-			heap[tmp_1]->heap_index = tmp_1;
-			heap[tmp_2]->heap_index = tmp_2;
-
+			swap_heap_nodes(heap + parent->heap_index, heap + node->heap_index);
 			node_index = parent_index;
 		}
 		else
@@ -193,7 +161,8 @@ Node **relax(Node *u, Node *v, Node **heap, int weight)
 	if (v->dist > u->dist + weight)
 	{
 		p[v->number] = u->number;
-		return decrease_key(v, heap, u->dist + weight, compare);
+		v->dist = u->dist + weight;
+		return sift_up(v, heap, compare);
 	}
 
 	return heap;
@@ -207,22 +176,15 @@ void dijkstra(int target, int size, Node *heap_base, Node **heap, list_node **ad
 	
 	heap_base[0].dist = 0;
 
-	while (1)
+	while (heap[0]->number != target)
 	{
 		u = heap[0];
-		border++;
-		swap(heap, heap + (size - border));
-		heap[0]->heap_index = 0;
-		heap[size - border]->heap_index = size - border;
-		heap = fix_heap(heap, size - border, compare);
 
-		if (heap[0] == u)
-		{
-			return;
-		}
+		border++;
+		swap_heap_nodes(heap, heap + size - border);
+		heap = sift_down(heap, 0, size - border, compare);
 
 		u->marked = 1;
-
 		head = adjacency_list[u->number];
 
 		while (head)
@@ -232,11 +194,6 @@ void dijkstra(int target, int size, Node *heap_base, Node **heap, list_node **ad
 				heap = relax(u, head->node, heap, head->weight);
 			}
 			head = head->next;
-		}
-
-		if (u->number == target)
-		{
-			return;
 		}
 	}
 }
@@ -271,6 +228,12 @@ int main()
 	Node **heap = (Node**)malloc(points * sizeof(Node*));
 	p = (int*)malloc(points * sizeof(int));
 
+	if (!adjacency_list || !heap_base || !heap || !p)
+	{
+		printf("Can't allocate memory");
+		return -1;
+	}
+
 	for (int i = 0; i < points; i++)
 	{
 		heap[i] = heap_base + i;
@@ -288,7 +251,18 @@ int main()
 		fscanf(input, "%d", &weight);
 
 		adjacency_list[from] = add_node(adjacency_list[from], heap[to], weight);
+
+		if (!adjacency_list[from])
+		{
+			return -1;
+		}
+
 		adjacency_list[to] = add_node(adjacency_list[to], heap[from], weight);
+
+		if (!adjacency_list[to])
+		{
+			return -1;
+		}
 	}
 
 	fclose(input);

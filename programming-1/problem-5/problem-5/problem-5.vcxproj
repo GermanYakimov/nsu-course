@@ -140,7 +140,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="heap.c" />
-    <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />
