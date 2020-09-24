@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 
@@ -73,6 +74,19 @@ public:
 			for (size_t j = 0; j < this->dimension; j++)
 			{
 				this->content[i][j] = that.content[i][j];
+			}
+		}
+	}
+
+	Matrix(size_t dim, ifstream& in): dimension(dim)
+	{
+		this->content = allocate_memory_for_matrix(dim);
+
+		for (size_t i = 0; i < this->dimension; i++)
+		{
+			for (size_t j = 0; j < this->dimension; j++)
+			{
+				in >> this->content[i][j];
 			}
 		}
 	}
@@ -195,18 +209,22 @@ public:
 		return !(*this == that);
 	}
 
-	void operator~()
+	Matrix operator~()
 	{
+		Matrix result(*this);
+
 		for (size_t i = 0; i < this->dimension; i++)
 		{
-			for (size_t j = 0; j < this->dimension; j++)
+			for (size_t j = i + 1; j < this->dimension; j++)
 			{
 				if (i != j)
 				{
-					swap(this->content[i][j], this->content[j][i]);
+					swap(result.content[i][j], result.content[j][i]);
 				}
 			}
 		}
+
+		return result;
 	}
 
 	Matrix operator()(size_t row, size_t column) const
@@ -248,6 +266,8 @@ public:
 
 	void print() const
 	{
+		cout << endl;
+
 		for (size_t i = 0; i < this->dimension; i++)
 		{
 			for (size_t j = 0; j < this->dimension; j++)
@@ -257,6 +277,49 @@ public:
 			cout << endl;
 		}
 	}
+
+	void print(string filename) const
+	{
+		ofstream out;
+		out.open(filename);
+
+		for (size_t i = 0; i < this->dimension; i++)
+		{
+			for (size_t j = 0; j < this->dimension; j++)
+			{
+				out << this->content[i][j] << " ";
+			}
+			out << endl;
+		}
+
+		out.close();
+	}
+
+	//void fill_from_file(ifstream& in)
+	//{
+	//	for (size_t i = 0; i < this->dimension; i++)
+	//	{
+	//		for (size_t j = 0; j < this->dimension; j++)
+	//		{
+	//			in >> this->content[i][j];
+	//		}
+	//	}
+	//}
+
+	//void fill_from_file(string filename)
+	//{
+	//	ifstream in(filename);
+
+	//	for (size_t i = 0; i < this->dimension; i++)
+	//	{
+	//		for (size_t j = 0; j < this->dimension; j++)
+	//		{
+	//			in >> this->content[i][j];
+	//		}
+	//	}
+
+	//	in.close();
+	//}
 
 	~Matrix()
 	{
@@ -278,11 +341,25 @@ Matrix operator*(int cofactor, const Matrix& A)
 
 int main()
 {
-	Matrix A(10);
-	A.print();
-	A = 3 * A * (2 * A);
-	cout << endl;
-	A.print();
+	string input_filename = "input.txt";
+	ifstream in(input_filename);
+	size_t dimension;
+	int k;
+	in >> dimension;
+	in >> k;
+	Matrix A(dimension, in), B(dimension, in), C(dimension, in), D(dimension, in);
+	in.close();
+
+	int* k_diag = new int[dimension];
+	for (size_t i = 0; i < dimension; i++)
+	{
+		k_diag[i] = k;
+	}
+
+	Matrix K(dimension, k_diag);
+	delete[] k_diag;
+
+	((A + B * (~C) + K) * (~D)).print("output.txt");
 
 	return EXIT_SUCCESS;
 }
