@@ -11,7 +11,7 @@ class Matrix {
 
 	int** allocate_memory_for_matrix(size_t size)
 	{
-		int** matrix = new int*[size];
+		int** matrix = new int* [size];
 
 		for (size_t i = 0; i < size; i++)
 		{
@@ -24,7 +24,7 @@ class Matrix {
 public:
 	Matrix() : dimension(0), content(nullptr) {}
 
-	Matrix(size_t dim, int* diag_elements): dimension(dim)
+	Matrix(size_t dim, int* diag_elements) : dimension(dim)
 	{
 		this->content = allocate_memory_for_matrix(dim);
 
@@ -65,7 +65,7 @@ public:
 		}
 	}
 
-	Matrix(const Matrix& that): dimension(that.dimension)
+	Matrix(const Matrix& that) : dimension(that.dimension)
 	{
 		this->content = allocate_memory_for_matrix(this->dimension);
 
@@ -78,7 +78,7 @@ public:
 		}
 	}
 
-	Matrix(size_t dim, ifstream& in): dimension(dim)
+	Matrix(size_t dim, ifstream& in) : dimension(dim)
 	{
 		this->content = allocate_memory_for_matrix(dim);
 
@@ -119,7 +119,7 @@ public:
 	{
 		if (that.dimension != this->dimension)
 		{
-			throw;
+			throw "Can't multiple matrixes with different dimensions.";
 		}
 
 		Matrix result(this->dimension);
@@ -159,7 +159,7 @@ public:
 	{
 		if (that.dimension != this->dimension)
 		{
-			throw;
+			throw "Can't add matrixes with different dimensions.";
 		}
 
 		Matrix result(this->dimension);
@@ -181,6 +181,31 @@ public:
 		tmp = tmp * (-1);
 
 		return tmp + *this;
+	}
+
+	Matrix operator-()
+	{
+		return (*this) * (-1);
+	}
+
+	void operator+=(const Matrix& that)
+	{
+		*this = *this + that;
+	}
+
+	void operator-=(const Matrix& that)
+	{
+		*this = *this - that;
+	}
+
+	void operator*=(const Matrix& that)
+	{
+		*this = *this * that;
+	}
+
+	void operator*=(int cofactor)
+	{
+		*this = (*this) * cofactor;
 	}
 
 	bool operator==(const Matrix& that) const
@@ -209,7 +234,7 @@ public:
 		return !(*this == that);
 	}
 
-	Matrix operator~()
+	Matrix operator~() const
 	{
 		Matrix result(*this);
 
@@ -231,14 +256,14 @@ public:
 	{
 		if (row > this->dimension || column > this->dimension)
 		{
-			throw;
+			throw "Can't create minor: column or row number greater than dimension.";
 		}
 		row--;
 		column--;
 
 		Matrix result(this->dimension - 1);
 
-		for (size_t i = 0; i < this->dimension - 1 ; i++)
+		for (size_t i = 0; i < this->dimension - 1; i++)
 		{
 			for (size_t j = 0; j < this->dimension - 1; j++)
 			{
@@ -295,32 +320,6 @@ public:
 		out.close();
 	}
 
-	//void fill_from_file(ifstream& in)
-	//{
-	//	for (size_t i = 0; i < this->dimension; i++)
-	//	{
-	//		for (size_t j = 0; j < this->dimension; j++)
-	//		{
-	//			in >> this->content[i][j];
-	//		}
-	//	}
-	//}
-
-	//void fill_from_file(string filename)
-	//{
-	//	ifstream in(filename);
-
-	//	for (size_t i = 0; i < this->dimension; i++)
-	//	{
-	//		for (size_t j = 0; j < this->dimension; j++)
-	//		{
-	//			in >> this->content[i][j];
-	//		}
-	//	}
-
-	//	in.close();
-	//}
-
 	~Matrix()
 	{
 		for (size_t i = 0; i < this->dimension; i++)
@@ -347,17 +346,9 @@ int main()
 	int k;
 	in >> dimension;
 	in >> k;
-	Matrix A(dimension, in), B(dimension, in), C(dimension, in), D(dimension, in);
+	Matrix A(dimension, in), B(dimension, in), C(dimension, in), D(dimension, in), K(dimension);
+	K *= k;
 	in.close();
-
-	int* k_diag = new int[dimension];
-	for (size_t i = 0; i < dimension; i++)
-	{
-		k_diag[i] = k;
-	}
-
-	Matrix K(dimension, k_diag);
-	delete[] k_diag;
 
 	((A + B * (~C) + K) * (~D)).print("output.txt");
 
