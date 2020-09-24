@@ -1,14 +1,12 @@
 #include <cstdio>
 #include <algorithm>
+#include <iostream>
 using namespace std;
 
 
-Matrix& operator*(int cofactor, Matrix const& matrix);
-
-Matrix& operator*(Matrix const& matrix, int cofactor);
-
 class Matrix {
 	int** content;
+	size_t dimension;
 
 	int** allocate_memory_for_matrix(size_t size)
 	{
@@ -23,8 +21,6 @@ class Matrix {
 	}
 
 public:
-	const size_t dimension;
-
 	Matrix() : dimension(0), content(nullptr) {}
 
 	Matrix(size_t dim, int* diag_elements): dimension(dim)
@@ -68,7 +64,7 @@ public:
 		}
 	}
 
-	Matrix(Matrix const& that): dimension(that.dimension)
+	Matrix(const Matrix& that): dimension(that.dimension)
 	{
 		this->content = allocate_memory_for_matrix(this->dimension);
 
@@ -81,49 +77,31 @@ public:
 		}
 	}
 
-	Matrix& operator=(Matrix const& that)
+	Matrix& operator=(const Matrix& that)
 	{
-		Matrix result(that);
-		return result;
-	}
-
-	void multiple_by_int(int cofactor)
-	{
-		for (size_t i = 0; i < this->dimension; i++)
+		if (*this != that)
 		{
-			for (size_t j = 0; j < this->dimension; j++)
+			for (size_t i = 0; i < this->dimension; i++)
 			{
-				this->content[i][j] *= cofactor;
+				delete[] this->content[i];
+			}
+			delete[] this->content;
+
+			this->dimension = that.dimension;
+			this->content = allocate_memory_for_matrix(this->dimension);
+
+			for (size_t i = 0; i < this->dimension; i++)
+			{
+				for (size_t j = 0; j < this->dimension; j++)
+				{
+					this->content[i][j] = that.content[i][j];
+				}
 			}
 		}
+		return *this;
 	}
 
-	Matrix& operator+(Matrix const& that)
-	{
-		if (that.dimension != this->dimension)
-		{
-			throw;
-		}
-
-		Matrix result(this->dimension);
-
-		for (size_t i = 0; i < this->dimension; i++)
-		{
-			for (size_t j = 0; j < this->dimension; j++)
-			{
-				result.content[i][j] = this->content[i][j] + that.content[i][j];
-			}
-		}
-
-		return result;
-	}
-
-	Matrix& operator-(Matrix const& that)
-	{
-		return that * (-1) + *this;
-	}
-
-	Matrix& operator*(Matrix const& that)
+	Matrix operator*(const Matrix& that) const
 	{
 		if (that.dimension != this->dimension)
 		{
@@ -148,7 +126,50 @@ public:
 		return result;
 	}
 
-	bool operator==(Matrix const& that)
+	Matrix operator*(int cofactor) const
+	{
+		Matrix result(*this);
+
+		for (size_t i = 0; i < this->dimension; i++)
+		{
+			for (size_t j = 0; j < this->dimension; j++)
+			{
+				result.content[i][j] *= cofactor;
+			}
+		}
+
+		return result;
+	}
+
+	Matrix operator+(const Matrix& that) const
+	{
+		if (that.dimension != this->dimension)
+		{
+			throw;
+		}
+
+		Matrix result(this->dimension);
+
+		for (size_t i = 0; i < this->dimension; i++)
+		{
+			for (size_t j = 0; j < this->dimension; j++)
+			{
+				result.content[i][j] = this->content[i][j] + that.content[i][j];
+			}
+		}
+
+		return result;
+	}
+
+	Matrix operator-(const Matrix& that) const
+	{
+		Matrix tmp = that;
+		tmp = tmp * (-1);
+
+		return tmp + *this;
+	}
+
+	bool operator==(const Matrix& that) const
 	{
 		if (this->dimension != that.dimension)
 		{
@@ -157,7 +178,7 @@ public:
 
 		for (size_t i = 0; i < this->dimension; i++)
 		{
-			for (size_t j = 0; j > this->dimension; j++)
+			for (size_t j = 0; j < this->dimension; j++)
 			{
 				if (this->content[i][j] != that.content[i][j])
 				{
@@ -169,7 +190,7 @@ public:
 		return true;
 	}
 
-	bool operator!=(Matrix const& that)
+	bool operator!=(const Matrix& that) const
 	{
 		return !(*this == that);
 	}
@@ -188,7 +209,7 @@ public:
 		}
 	}
 
-	Matrix& operator()(size_t row, size_t column)
+	Matrix operator()(size_t row, size_t column) const
 	{
 		if (row > this->dimension || column > this->dimension)
 		{
@@ -225,6 +246,18 @@ public:
 		return result;
 	}
 
+	void print() const
+	{
+		for (size_t i = 0; i < this->dimension; i++)
+		{
+			for (size_t j = 0; j < this->dimension; j++)
+			{
+				cout << this->content[i][j] << " ";
+			}
+			cout << endl;
+		}
+	}
+
 	~Matrix()
 	{
 		for (size_t i = 0; i < this->dimension; i++)
@@ -236,15 +269,20 @@ public:
 
 };
 
-Matrix& operator*(int cofactor, Matrix const& matrix)
-{
-	Matrix result = matrix;
-	result.multiple_by_int(cofactor);
 
-	return result;
+Matrix operator*(int cofactor, const Matrix& A)
+{
+	return A * cofactor;
 }
 
-Matrix& operator*(Matrix const& matrix, int cofactor)
+
+int main()
 {
-	return matrix * cofactor;
+	Matrix A(10);
+	A.print();
+	A = 3 * A * (2 * A);
+	cout << endl;
+	A.print();
+
+	return EXIT_SUCCESS;
 }
