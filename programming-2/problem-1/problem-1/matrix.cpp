@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <vector>
+#include <functional>
 using namespace std;
 
 
@@ -44,7 +46,7 @@ class Matrix {
 public:
 	Matrix() : dimension(0), content(nullptr) {}
 
-	Matrix(size_t dim, int* diag_elements) : dimension(dim), content(allocate_memory_for_matrix(dim))
+	Matrix(const size_t dim, int* diag_elements) : dimension(dim), content(allocate_memory_for_matrix(dim))
 	{
 		for (size_t i = 0; i < dim; i++)
 		{
@@ -63,7 +65,7 @@ public:
 	}
 
 	// Initializing I here
-	Matrix(size_t dim) : dimension(dim), content(allocate_memory_for_matrix(dim))
+	Matrix(const size_t dim) : dimension(dim), content(allocate_memory_for_matrix(dim))
 	{
 		for (size_t i = 0; i < dim; i++)
 		{
@@ -86,7 +88,7 @@ public:
 		copy_matrix(this->content, that.content, this->dimension);
 	}
 
-	Matrix(size_t dim, ifstream& in) : dimension(dim), content(allocate_memory_for_matrix(dim))
+	Matrix(const size_t dim, ifstream& in) : dimension(dim), content(allocate_memory_for_matrix(dim))
 	{
 		for (size_t i = 0; i < this->dimension; i++)
 		{
@@ -141,7 +143,7 @@ public:
 		return result;
 	}
 
-	Matrix operator*(int constant) const
+	Matrix operator*(const int constant) const
 	{
 		Matrix result(*this);
 
@@ -205,7 +207,7 @@ public:
 		*this = *this * that;
 	}
 
-	void operator*=(int constant)
+	void operator*=(const int constant)
 	{
 		*this = (*this) * constant;
 	}
@@ -294,6 +296,19 @@ public:
 		return result;
 	}
 
+	int*& operator[](const size_t index) {
+		if (index > this->dimension) {
+			throw "Row index greater than dimension.";
+		}
+
+		return this->content[index - 1];
+	}
+
+	//void operator()(const size_t index)
+	//{
+	//	reference_wrapper<int> a;
+	//}
+
 	void print() const
 	{
 		cout << endl;
@@ -355,6 +370,15 @@ int main()
 	K *= k;
 
 	((A + B * (~C) + K) * (~D)).print("output.txt");
+	A.print();
+	B.print();
+
+	A += B;
+	A.print();
+	A[2][2] += 5;
+	A(2)[2] -= 5;
+	cout << A[1][1];
+	A.print();
 
 	return EXIT_SUCCESS;
 }
