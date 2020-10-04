@@ -20,12 +20,6 @@ int main()
 
 	K *= k;
 
-	A.print();
-	A[2][1] -= 10;
-	A.print();
-	A(1)[2] -= 5;
-	A.print();
-
 	((A + B * (~C) + K) * (~D)).print("output.txt");
 
 	return EXIT_SUCCESS;

@@ -187,7 +187,7 @@ Matrix Matrix::operator-(const Matrix& that) const
 
 Matrix Matrix::operator-()
 {
-	return (*this) * (-1);
+	return *this * (-1);
 }
 
 void Matrix::operator+=(const Matrix& that)
@@ -207,7 +207,7 @@ void Matrix::operator*=(const Matrix& that)
 
 void Matrix::operator*=(const int constant)
 {
-	*this = (*this) * constant;
+	*this = *this * constant;
 }
 
 //matrix equality
@@ -258,9 +258,9 @@ Matrix Matrix::operator~() const
 
 Matrix Matrix::operator()(size_t row, size_t column) const
 {
-	if (row > this->dimension || column > this->dimension)
+	if (row > this->dimension || column > this->dimension || row == 0 || column == 0)
 	{
-		throw "Can't create minor: column or row number greater than dimension.";
+		throw "Can't create minor: column or row number is greater than dimension.";
 	}
 
 	row--;
@@ -295,16 +295,16 @@ Matrix Matrix::operator()(size_t row, size_t column) const
 }
 
 row Matrix::operator[](const size_t index) {
-	if (index > this->dimension) {
-		throw "Row index greater than dimension.";
+	if (index > this->dimension || index == 0) {
+		throw "Row index is greater than dimension.";
 	}
 
 	return row(index, *this);
 }
 
 column Matrix::operator()(const size_t index) {
-	if (index > this->dimension) {
-		throw "Row index greater than dimension.";
+	if (index > this->dimension || index == 0) {
+		throw "Row index is greater than dimension.";
 	}
 
 	return column(index, *this);
@@ -357,9 +357,9 @@ row::row(size_t idx, Matrix& M): row_index(idx - 1), matrix(M) {}
 
 int& row::operator[](size_t idx)
 {
-	if (idx > this->matrix.dimension)
+	if (idx > this->matrix.dimension || idx == 0)
 	{
-		throw;
+		throw "Row index is greater than dimension.";
 	}
 
 	return this->matrix.content[this->row_index][idx - 1];
@@ -369,9 +369,9 @@ column::column(size_t idx, Matrix& M): column_index(idx - 1), matrix(M) {}
 
 int& column::operator[](size_t idx)
 {
-	if (idx > this->matrix.dimension)
+	if (idx > this->matrix.dimension || idx == 0)
 	{
-		throw;
+		throw "Column index is greater than dimension.";
 	}
 
 	return this->matrix.content[idx - 1][this->column_index];
