@@ -329,6 +329,34 @@ void Matrix::print(ofstream& out) const
 	}
 }
 
+ostream& Matrix::operator<<(ostream& out) const
+{
+	for (size_t i = 0; i < this->dimension; i++)
+	{
+		for (size_t j = 0; j < this->dimension; j++)
+		{
+			out << this->content[i][j] << " ";
+		}
+		out << endl;
+	}
+
+	return out;
+}
+
+istream& Matrix::operator>>(istream& in)
+{
+	for (size_t i = 0; i < this->dimension; i++)
+	{
+		for (size_t j = 0; j < this->dimension; j++)
+		{
+			in >> this->content[i][j];
+		}
+	}
+
+	return in;
+}
+
+
 Matrix::~Matrix()
 {
 	delete_matrix(this->content, this->dimension);

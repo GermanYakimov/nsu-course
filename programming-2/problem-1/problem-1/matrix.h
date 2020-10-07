@@ -96,6 +96,10 @@ public:
 
 	void print(ofstream& out) const;
 
+	ostream& operator<<(ostream& out) const;
+
+	istream& operator>>(istream& in);
+
 	~Matrix();
 
 };
