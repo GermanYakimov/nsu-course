@@ -69,14 +69,7 @@ Matrix::Matrix(const size_t dim) : dimension(dim), content(allocate_memory_for_m
 	{
 		for (size_t j = 0; j < dim; j++)
 		{
-			if (i == j)
-			{
-				this->content[i][j] = 1;
-			}
-			else
-			{
-				this->content[i][j] = 0;
-			}
+			this->content[i][j] = (i == j);
 		}
 	}
 }
@@ -294,20 +287,20 @@ Matrix Matrix::operator()(size_t row, size_t column) const
 	return result;
 }
 
-row Matrix::operator[](const size_t index) {
+Row Matrix::operator[](const size_t index) {
 	if (index > this->dimension || index == 0) {
 		throw "Row index is greater than dimension.";
 	}
 
-	return row(index, *this);
+	return Row(index, *this);
 }
 
-column Matrix::operator()(const size_t index) {
+Column Matrix::operator()(const size_t index) {
 	if (index > this->dimension || index == 0) {
 		throw "Row index is greater than dimension.";
 	}
 
-	return column(index, *this);
+	return Column(index, *this);
 }
 
 void Matrix::print() const
@@ -324,11 +317,8 @@ void Matrix::print() const
 	}
 }
 
-void Matrix::print(string filename) const
+void Matrix::print(ofstream& out) const
 {
-	ofstream out;
-	out.open(filename);
-
 	for (size_t i = 0; i < this->dimension; i++)
 	{
 		for (size_t j = 0; j < this->dimension; j++)
@@ -337,8 +327,6 @@ void Matrix::print(string filename) const
 		}
 		out << endl;
 	}
-
-	out.close();
 }
 
 Matrix::~Matrix()
@@ -353,9 +341,9 @@ Matrix operator*(int constant, const Matrix& A)
 }
 
 
-row::row(size_t idx, Matrix& M): row_index(idx - 1), matrix(M) {}
+Row::Row(size_t idx, Matrix& M): row_index(idx - 1), matrix(M) {}
 
-int& row::operator[](size_t idx)
+int& Row::operator[](size_t idx)
 {
 	if (idx > this->matrix.dimension || idx == 0)
 	{
@@ -365,9 +353,9 @@ int& row::operator[](size_t idx)
 	return this->matrix.content[this->row_index][idx - 1];
 }
 
-column::column(size_t idx, Matrix& M): column_index(idx - 1), matrix(M) {}
+Column::Column(size_t idx, Matrix& M): column_index(idx - 1), matrix(M) {}
 
-int& column::operator[](size_t idx)
+int& Column::operator[](size_t idx)
 {
 	if (idx > this->matrix.dimension || idx == 0)
 	{

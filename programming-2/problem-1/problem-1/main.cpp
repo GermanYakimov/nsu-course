@@ -20,7 +20,9 @@ int main()
 
 	K *= k;
 
-	((A + B * (~C) + K) * (~D)).print("output.txt");
+	ofstream output("output.txt");
+	((A + B * (~C) + K) * (~D)).print(output);
+	output.close();
 
 	return EXIT_SUCCESS;
 }

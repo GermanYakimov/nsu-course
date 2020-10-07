@@ -12,23 +12,23 @@ void delete_matrix(int** source, size_t dim);
 
 class Matrix;
 
-class row {
+class Row {
 	const size_t row_index;
 	Matrix& matrix;
 
 public:
-	row(size_t idx, Matrix& M);
+	Row(size_t idx, Matrix& M);
 
 	int& operator[](size_t idx);
 };
 
 
-class column {
+class Column {
 	const size_t column_index;
 	Matrix& matrix;
 
 public:
-	column(size_t idx, Matrix& M);
+	Column(size_t idx, Matrix& M);
 
 	int& operator[](size_t idx);
 };
@@ -38,8 +38,8 @@ class Matrix {
 	int** content;
 	size_t dimension;
 
-	friend class row;
-	friend class column;
+	friend class Row;
+	friend class Column;
 
 public:
 	Matrix();
@@ -88,13 +88,13 @@ public:
 
 	Matrix operator()(size_t row, size_t column) const;
 
-	row operator[](const size_t index);
+	Row operator[](const size_t index);
 
-	column operator()(const size_t index);
+	Column operator()(const size_t index);
 
 	void print() const;
 
-	void print(string filename) const;
+	void print(ofstream& out) const;
 
 	~Matrix();
 
