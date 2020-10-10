@@ -4,6 +4,7 @@
 #include <fstream>
 #include <vector>
 #include <functional>
+#include <stdexcept>
 
 #include "matrix.h"
 
@@ -113,7 +114,7 @@ Matrix Matrix::operator*(const Matrix& that) const
 {
 	if (that.dimension != this->dimension)
 	{
-		throw "Can't multiple matrixes with different dimensions.";
+		throw invalid_argument("Can't multiple matrixes with different dimensions.");
 	}
 
 	Matrix result(this->dimension);
@@ -154,7 +155,7 @@ Matrix Matrix::operator+(const Matrix& that) const
 {
 	if (that.dimension != this->dimension)
 	{
-		throw "Can't add matrixes with different dimensions.";
+		throw invalid_argument("Can't add matrixes with different dimensions.");
 	}
 
 	Matrix result(this->dimension);
@@ -251,13 +252,13 @@ Matrix Matrix::operator~() const
 
 Matrix Matrix::operator()(size_t row, size_t column) const
 {
-	if (row > this->dimension || column > this->dimension || row == 0 || column == 0)
-	{
-		throw "Can't create minor: column or row number is greater than dimension.";
-	}
+	//if (row > this->dimension || column > this->dimension || row == 0 || column == 0)
+	//{
+	//	throw invalid_argument("Can't create minor: column or row number is greater than dimension.");
+	//}
 
-	row--;
-	column--;
+	//row--;
+	//column--;
 
 	Matrix result(this->dimension - 1);
 
@@ -288,16 +289,18 @@ Matrix Matrix::operator()(size_t row, size_t column) const
 }
 
 Row Matrix::operator[](const size_t index) {
-	if (index > this->dimension || index == 0) {
-		throw "Row index is greater than dimension.";
+	if (index >= this->dimension)
+	{
+		throw invalid_argument("Row index is greater than dimension.");
 	}
 
 	return Row(index, *this);
 }
 
 Column Matrix::operator()(const size_t index) {
-	if (index > this->dimension || index == 0) {
-		throw "Row index is greater than dimension.";
+	if (index >= this->dimension)
+	{
+		throw invalid_argument("Row index is greater than dimension.");
 	}
 
 	return Column(index, *this);
@@ -369,26 +372,26 @@ Matrix operator*(int constant, const Matrix& A)
 }
 
 
-Row::Row(size_t idx, Matrix& M): row_index(idx - 1), matrix(M) {}
+Row::Row(size_t idx, Matrix& M): row_index(idx), matrix(M) {}
 
 int& Row::operator[](size_t idx)
 {
-	if (idx > this->matrix.dimension || idx == 0)
+	if (idx >= this->matrix.dimension)
 	{
-		throw "Row index is greater than dimension.";
+		throw invalid_argument("Row index is greater than dimension.");
 	}
 
-	return this->matrix.content[this->row_index][idx - 1];
+	return this->matrix.content[this->row_index][idx];
 }
 
-Column::Column(size_t idx, Matrix& M): column_index(idx - 1), matrix(M) {}
+Column::Column(size_t idx, Matrix& M): column_index(idx), matrix(M) {}
 
 int& Column::operator[](size_t idx)
 {
-	if (idx > this->matrix.dimension || idx == 0)
+	if (idx >= this->matrix.dimension)
 	{
-		throw "Column index is greater than dimension.";
+		throw invalid_argument("Column index is greater than dimension.");
 	}
 
-	return this->matrix.content[idx - 1][this->column_index];
+	return this->matrix.content[idx][this->column_index];
 }

@@ -7,8 +7,7 @@ using namespace std;
 
 int main()
 {
-	string input_filename = "input.txt";
-	ifstream input(input_filename);
+	ifstream input("input.txt");
 	size_t dimension;
 	int k;
 
