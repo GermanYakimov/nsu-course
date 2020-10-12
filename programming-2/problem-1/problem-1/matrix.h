@@ -41,6 +41,9 @@ class Matrix {
 	friend class Row;
 	friend class Column;
 
+	friend ostream& operator<<(ostream& out, Matrix matrix);
+	friend istream& operator>>(istream& in, Matrix& matrix);
+
 public:
 	Matrix();
 
@@ -70,13 +73,13 @@ public:
 
 	Matrix operator-();
 
-	void operator+=(const Matrix& that);
+	Matrix& operator+=(const Matrix& that);
 
-	void operator-=(const Matrix& that);
+	Matrix& operator-=(const Matrix& that);
 
-	void operator*=(const Matrix& that);
+	Matrix& operator*=(const Matrix& that);
 
-	void operator*=(const int constant);
+	Matrix& operator*=(const int constant);
 
 	//matrix equality
 	bool operator==(const Matrix& that) const;
@@ -95,10 +98,6 @@ public:
 	void print() const;
 
 	void print(ofstream& out) const;
-
-	ostream& operator<<(ostream& out) const;
-
-	istream& operator>>(istream& in);
 
 	~Matrix();
 

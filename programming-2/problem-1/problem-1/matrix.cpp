@@ -184,24 +184,32 @@ Matrix Matrix::operator-()
 	return *this * (-1);
 }
 
-void Matrix::operator+=(const Matrix& that)
+Matrix& Matrix::operator+=(const Matrix& that)
 {
 	*this = *this + that;
+	
+	return *this;
 }
 
-void Matrix::operator-=(const Matrix& that)
+Matrix& Matrix::operator-=(const Matrix& that)
 {
 	*this = *this - that;
+
+	return *this;
 }
 
-void Matrix::operator*=(const Matrix& that)
+Matrix& Matrix::operator*=(const Matrix& that)
 {
 	*this = *this * that;
+
+	return *this;
 }
 
-void Matrix::operator*=(const int constant)
+Matrix& Matrix::operator*=(const int constant)
 {
 	*this = *this * constant;
+
+	return *this;
 }
 
 //matrix equality
@@ -252,14 +260,6 @@ Matrix Matrix::operator~() const
 
 Matrix Matrix::operator()(size_t row, size_t column) const
 {
-	//if (row > this->dimension || column > this->dimension || row == 0 || column == 0)
-	//{
-	//	throw invalid_argument("Can't create minor: column or row number is greater than dimension.");
-	//}
-
-	//row--;
-	//column--;
-
 	Matrix result(this->dimension - 1);
 
 	for (size_t i = 0; i < this->dimension - 1; i++)
@@ -332,13 +332,13 @@ void Matrix::print(ofstream& out) const
 	}
 }
 
-ostream& Matrix::operator<<(ostream& out) const
+ostream& operator<<(ostream& out, Matrix matrix)
 {
-	for (size_t i = 0; i < this->dimension; i++)
+	for (size_t i = 0; i < matrix.dimension; i++)
 	{
-		for (size_t j = 0; j < this->dimension; j++)
+		for (size_t j = 0; j < matrix.dimension; j++)
 		{
-			out << this->content[i][j] << " ";
+			out << matrix.content[i][j] << " ";
 		}
 		out << endl;
 	}
@@ -346,13 +346,13 @@ ostream& Matrix::operator<<(ostream& out) const
 	return out;
 }
 
-istream& Matrix::operator>>(istream& in)
+istream& operator>>(istream& in, Matrix& matrix)
 {
-	for (size_t i = 0; i < this->dimension; i++)
+	for (size_t i = 0; i < matrix.dimension; i++)
 	{
-		for (size_t j = 0; j < this->dimension; j++)
+		for (size_t j = 0; j < matrix.dimension; j++)
 		{
-			in >> this->content[i][j];
+			in >> matrix.content[i][j];
 		}
 	}
 

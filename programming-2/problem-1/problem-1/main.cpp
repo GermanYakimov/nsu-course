@@ -15,16 +15,13 @@ int main()
 	input >> k;
 
 	Matrix A(dimension), B(dimension), C(dimension), D(dimension), K(dimension);
-	A >> input;
-	B >> input;
-	C >> input;
-	D >> input;
+	input >> A >> B >> C >> D;
 	input.close();
 
 	K *= k;
 
 	ofstream output("output.txt");
-	(A + B * (~C) + K) * (~D) << output;
+	output << (A + B * (~C) + K) * (~D);
 	output.close();
 
 	return EXIT_SUCCESS;
