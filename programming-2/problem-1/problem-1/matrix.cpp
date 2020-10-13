@@ -11,19 +11,19 @@
 using namespace std;
 
 
-int** allocate_memory_for_matrix(size_t dim)
+double** allocate_memory_for_matrix(size_t dim)
 {
-	int** matrix = new int* [dim];
+	double** matrix = new double* [dim];
 
 	for (size_t i = 0; i < dim; i++)
 	{
-		matrix[i] = new int[dim];
+		matrix[i] = new double[dim];
 	}
 
 	return matrix;
 }
 
-void copy_matrix(int** dest, int** source, size_t dim)
+void copy_matrix(double** dest, double** source, size_t dim)
 {
 	for (size_t i = 0; i < dim; i++)
 	{
@@ -34,7 +34,7 @@ void copy_matrix(int** dest, int** source, size_t dim)
 	}
 }
 
-void delete_matrix(int** source, size_t dim)
+void delete_matrix(double** source, size_t dim)
 {
 	for (size_t i = 0; i < dim; i++)
 	{
@@ -45,7 +45,7 @@ void delete_matrix(int** source, size_t dim)
 
 Matrix::Matrix() : dimension(0), content(nullptr) {}
 
-Matrix::Matrix(const size_t dim, int* diag_elements) : dimension(dim), content(allocate_memory_for_matrix(dim))
+Matrix::Matrix(const size_t dim, double* diag_elements) : dimension(dim), content(allocate_memory_for_matrix(dim))
 {
 	for (size_t i = 0; i < dim; i++)
 	{
@@ -57,7 +57,7 @@ Matrix::Matrix(const size_t dim, int* diag_elements) : dimension(dim), content(a
 			}
 			else
 			{
-				this->content[i][j] = 0;
+				this->content[i][j] = 0.0;
 			}
 		}
 	}
@@ -135,7 +135,7 @@ Matrix Matrix::operator*(const Matrix& that) const
 	return result;
 }
 
-Matrix Matrix::operator*(const int constant) const
+Matrix Matrix::operator*(const double constant) const
 {
 	Matrix result(*this);
 
@@ -205,7 +205,7 @@ Matrix& Matrix::operator*=(const Matrix& that)
 	return *this;
 }
 
-Matrix& Matrix::operator*=(const int constant)
+Matrix& Matrix::operator*=(const double constant)
 {
 	*this = *this * constant;
 
@@ -374,7 +374,7 @@ Matrix operator*(int constant, const Matrix& A)
 
 Row::Row(size_t idx, Matrix& M): row_index(idx), matrix(M) {}
 
-int& Row::operator[](size_t idx)
+double& Row::operator[](size_t idx)
 {
 	if (idx >= this->matrix.dimension)
 	{
@@ -386,7 +386,7 @@ int& Row::operator[](size_t idx)
 
 Column::Column(size_t idx, Matrix& M): column_index(idx), matrix(M) {}
 
-int& Column::operator[](size_t idx)
+double& Column::operator[](size_t idx)
 {
 	if (idx >= this->matrix.dimension)
 	{

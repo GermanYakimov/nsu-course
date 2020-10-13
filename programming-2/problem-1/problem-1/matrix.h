@@ -4,11 +4,11 @@
 using namespace std;
 
 
-int** allocate_memory_for_matrix(size_t dim);
+double** allocate_memory_for_matrix(size_t dim);
 
-void copy_matrix(int** dest, int** source, size_t dim);
+void copy_matrix(double** dest, double** source, size_t dim);
 
-void delete_matrix(int** source, size_t dim);
+void delete_matrix(double** source, size_t dim);
 
 class Matrix;
 
@@ -19,7 +19,7 @@ class Row {
 public:
 	Row(size_t idx, Matrix& M);
 
-	int& operator[](size_t idx);
+	double& operator[](size_t idx);
 };
 
 
@@ -30,12 +30,12 @@ class Column {
 public:
 	Column(size_t idx, Matrix& M);
 
-	int& operator[](size_t idx);
+	double& operator[](size_t idx);
 };
 
 
 class Matrix {
-	int** content;
+	double** content;
 	size_t dimension;
 
 	friend class Row;
@@ -47,7 +47,7 @@ class Matrix {
 public:
 	Matrix();
 
-	Matrix(const size_t dim, int* diag_elements);
+	Matrix(const size_t dim, double* diag_elements);
 
 	// Initializing I here
 	Matrix(const size_t dim);
@@ -64,7 +64,7 @@ public:
 	// matrix product
 	Matrix operator*(const Matrix& that) const;
 
-	Matrix operator*(const int constant) const;
+	Matrix operator*(const double constant) const;
 
 	//matrix sum
 	Matrix operator+(const Matrix& that) const;
@@ -79,7 +79,7 @@ public:
 
 	Matrix& operator*=(const Matrix& that);
 
-	Matrix& operator*=(const int constant);
+	Matrix& operator*=(const double constant);
 
 	//matrix equality
 	bool operator==(const Matrix& that) const;
@@ -104,4 +104,4 @@ public:
 };
 
 
-Matrix operator*(int constant, const Matrix& A);
+Matrix operator*(double constant, const Matrix& A);
