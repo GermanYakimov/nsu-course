@@ -13,6 +13,8 @@ public:
 	virtual void print(ostream& out) = 0;
 
 	virtual double eval(string denotion) = 0;
+
+	virtual Expression* derivative(string var) = 0;
 };
 
 
@@ -33,6 +35,11 @@ public:
 	virtual void print(ostream& out)
 	{
 		out << value;
+	}
+
+	virtual Expression* derivative(string var)
+	{
+		return new Number(0);
 	}
 };
 
@@ -71,6 +78,14 @@ public:
 	{
 		out << name;
 	}
+
+	virtual Expression* derivative(string var)
+	{
+		if (var == this->name)
+		{
+			return new Number(1);
+		}
+	}
 };
 
 
@@ -89,17 +104,16 @@ public:
 
 	virtual void print(ostream& out)
 	{
-		cout << "(";
+		out << "(";
 		term_1->print(out);
-		out << " + ";
+		out << "+";
 		term_2->print(out);
-		cout << ")";
+		out << ")";
 	}
 
-	~Add()
+	virtual Expression* derivative(string var)
 	{
-		delete term_1;
-		delete term_2;
+		return new Add(term_1->derivative(var), term_2->derivative(var));
 	}
 };
 
@@ -119,17 +133,16 @@ public:
 
 	virtual void print(ostream& out)
 	{
-		cout << "(";
+		out << "(";
 		term_1->print(out);
-		out << " - ";
+		out << "-";
 		term_2->print(out);
-		cout << ")";
+		out << ")";
 	}
 
-	~Sub()
+	virtual Expression* derivative(string var)
 	{
-		delete term_1;
-		delete term_2;
+		return new Sub(term_1->derivative(var), term_2->derivative(var));
 	}
 };
 
@@ -149,17 +162,16 @@ public:
 
 	virtual void print(ostream& out)
 	{
-		cout << "(";
+		out << "(";
 		factor_1->print(out);
-		out << " * ";
+		out << "*";
 		factor_2->print(out);
-		cout << ")";
+		out << ")";
 	}
 
-	~Mul()
+	virtual Expression* derivative(string var)
 	{
-		delete factor_1;
-		delete factor_2;
+		return new Add(new Mul(factor_1->derivative(var), factor_2), new Mul(factor_1, factor_2->derivative(var)));
 	}
 };
 
@@ -179,17 +191,16 @@ public:
 
 	virtual void print(ostream& out)
 	{
-		cout << "(";
+		out << "(";
 		numerator->print(out);
-		out << " / ";
+		out << "/";
 		denominator->print(out);
-		cout << ")";
+		out << ")";
 	}
 
-	~Div()
+	virtual Expression* derivative(string var)
 	{
-		delete numerator;
-		delete denominator;
+		return new Div(new Sub(new Mul(numerator->derivative(var), denominator), new Mul(numerator, denominator->derivative(var))), new Mul(denominator, denominator));
 	}
 };
 
@@ -263,26 +274,17 @@ Expression* build_expression(string source)
 
 int main()
 {
-	Variable* x = new Variable("x");
-	Variable* y = new Variable("y");
-	Div* x_y = new Div(x, y);
+	ifstream input("input.txt");
+	string exp_source;
+	input >> exp_source;
+	input.close();
 
-	x_y->print(cout);
-	cout << endl;
+	Expression* exp = build_expression(exp_source);
 
-	cout << x_y->eval("x <- 40; z <- 30; y <- 10") << endl;
-	
-	Expression* exp = build_expression("(((2*x)+(x*x))-3)");
-	exp->print(cout);
-	cout << endl;
-
-	//cout << x.eval("y -> 15; x -> 10; z -> 30") << endl;
-	//y.eval("y -> 15");
-
-	delete x;
-	delete y;
-	delete x_y;
-
+	Expression* d = exp->derivative("x");
+	ofstream output("output.txt");
+	d->print(output);
+	output.close();
 
 	return EXIT_SUCCESS;
 }
