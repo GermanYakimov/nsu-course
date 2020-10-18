@@ -8,17 +8,17 @@ class Expression
 public:
 	Expression() {}
 
-	virtual void print(ostream& out) = 0;
+	virtual void print(ostream& out) const = 0;
 
-	virtual double eval(string denotion) = 0;
+	virtual double eval(const string denotion) const = 0;
 
-	virtual Expression* derivative(string var) = 0;
+	virtual Expression* derivative(const string var) const = 0;
 
-	virtual Expression* copy() = 0;
+	virtual Expression* copy() const = 0;
 
-	virtual Expression* reduce() = 0;
+	virtual Expression* reduce() const = 0;
 
-	virtual bool operator==(Expression* that) = 0;
+	virtual bool operator==(const Expression* that) const = 0;
 };
 
 
@@ -27,21 +27,23 @@ class Number : public Expression
 	double value;
 
 public:
-	Number(int val);
+	Number();
 
-	Number(double val);
+	Number(const int val);
 
-	virtual double eval(string denotion);
+	Number(const double val);
 
-	virtual void print(ostream& out);
+	virtual double eval(const string denotion) const;
 
-	virtual Expression* copy();
+	virtual void print(ostream& out) const;
 
-	virtual Expression* derivative(string var);
+	virtual Expression* copy() const;
 
-	virtual Expression* reduce();
+	virtual Expression* derivative(const string var) const;
 
-	virtual bool operator==(Expression* that);
+	virtual Expression* reduce() const;
+
+	virtual bool operator==(const Expression* that) const;
 
 };
 
@@ -52,19 +54,19 @@ class Variable : public Expression
 
 public:
 
-	Variable(string var);
+	Variable(const string var);
 
-	virtual double eval(string denotion);
+	virtual double eval(const string denotion) const;
 
-	virtual void print(ostream& out);
+	virtual void print(ostream& out) const;
 
-	virtual Expression* copy();
+	virtual Expression* copy() const;
 
-	virtual Expression* derivative(string var);
+	virtual Expression* derivative(const string var) const;
 
-	virtual Expression* reduce();
+	virtual Expression* reduce() const;
 
-	virtual bool operator==(Expression* that);
+	virtual bool operator==(const Expression* that) const;
 
 };
 
@@ -84,17 +86,17 @@ public:
 
 	Add();
 
-	virtual double eval(string denotion);
+	virtual double eval(const string denotion) const;
 
-	virtual void print(ostream& out);
+	virtual void print(ostream& out) const;
 
-	virtual Expression* copy();
+	virtual Expression* copy() const;
 
-	virtual Expression* derivative(string var);
+	virtual Expression* derivative(const string var) const;
 
-	virtual Expression* reduce();
+	virtual Expression* reduce() const;
 
-	virtual bool operator==(Expression* that);
+	virtual bool operator==(const Expression* that) const;
 
 	~Add();
 
@@ -116,17 +118,17 @@ public:
 
 	Sub();
 
-	virtual double eval(string denotion);
+	virtual double eval(const string denotion) const;
 
-	virtual void print(ostream& out);
+	virtual void print(ostream& out) const;
 
-	virtual Expression* copy();
+	virtual Expression* copy() const;
 
-	virtual Expression* derivative(string var);
+	virtual Expression* derivative(const string var) const;
 
-	virtual Expression* reduce();
+	virtual Expression* reduce() const;
 
-	virtual bool operator==(Expression* that);
+	virtual bool operator==(const Expression* that) const;
 
 	~Sub();
 };
@@ -146,17 +148,17 @@ public:
 
 	Mul();
 
-	virtual double eval(string denotion);
+	virtual double eval(const string denotion) const;
 
-	virtual void print(ostream& out);
+	virtual void print(ostream& out) const;
 
-	virtual Expression* copy();
+	virtual Expression* copy() const;
 
-	virtual Expression* derivative(string var);
+	virtual Expression* derivative(const string var) const;
 
-	virtual Expression* reduce();
+	virtual Expression* reduce() const;
 
-	virtual bool operator==(Expression* that);
+	virtual bool operator==(const Expression* that) const;
 
 	~Mul();
 };
@@ -174,17 +176,17 @@ class Div : public Expression
 public:
 	Div();
 
-	virtual double eval(string denotion);
+	virtual double eval(const string denotion) const;
 
-	virtual void print(ostream& out);
+	virtual void print(ostream& out) const;
 
-	virtual Expression* copy();
+	virtual Expression* copy() const;
 
-	virtual Expression* derivative(string var);
+	virtual Expression* derivative(const string var) const;
 
-	virtual Expression* reduce();
+	virtual Expression* reduce() const;
 
-	virtual bool operator==(Expression* that);
+	virtual bool operator==(const Expression* that) const;
 
 	~Div();
 };

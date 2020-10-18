@@ -5,37 +5,38 @@ using namespace std;
 
 #include "expressions.h"
 
+Number::Number(): value(0.) {}
 
-Number::Number(int val) : value(val * 1.0) {}
+Number::Number(const int val) : value(val * 1.0) {}
 
-Number::Number(double val) : value(val) {}
+Number::Number(const double val) : value(val) {}
 
-double Number::eval(string denotion)
+double Number::eval(const string denotion) const
 {
 	return this->value;
 }
 
-void Number::print(ostream& out)
+void Number::print(ostream& out)  const
 {
 	out << value;
 }
 
-Expression* Number::copy()
+Expression* Number::copy()  const
 {
 	return new Number(this->value);
 }
 
-Expression* Number::derivative(string var)
+Expression* Number::derivative(const string var) const
 {
 	return new Number(0);
 }
 
-Expression* Number::reduce()
+Expression* Number::reduce()  const
 {
 	return this->copy();
 }
 
-bool Number::operator==(Expression* that)
+bool Number::operator==(const Expression* that) const
 {
 	Expression* that_reduced = that->reduce();
 
@@ -45,9 +46,9 @@ bool Number::operator==(Expression* that)
 }
 
 
-Variable::Variable(string var) : name(var) {}
+Variable::Variable(const string var) : name(var) {}
 
-double Variable::eval(string denotion)
+double Variable::eval(const string denotion) const
 {
 
 	size_t start_index = denotion.find(name + " <- ") + name.length() + 4;
@@ -69,17 +70,17 @@ double Variable::eval(string denotion)
 	return value_num;
 }
 
-void Variable::print(ostream& out)
+void Variable::print(ostream& out) const
 {
 	out << name;
 }
 
-Expression* Variable::copy()
+Expression* Variable::copy() const
 {
 	return new Variable(this->name);
 }
 
-Expression* Variable::derivative(string var)
+Expression* Variable::derivative(const string var) const
 {
 	if (var == this->name)
 	{
@@ -87,12 +88,12 @@ Expression* Variable::derivative(string var)
 	}
 }
 
-Expression* Variable::reduce()
+Expression* Variable::reduce() const
 {
 	return this->copy();
 }
 
-bool Variable::operator==(Expression* that)
+bool Variable::operator==(const Expression* that) const
 {
 	Expression* that_reduced = that->reduce();
 
@@ -106,12 +107,12 @@ Add::Add(Expression* exp_1, Expression* exp_2) : term_1(exp_1), term_2(exp_2) {}
 
 Add::Add() : term_1(nullptr), term_2(nullptr) {}
 
-double Add::eval(string denotion)
+double Add::eval(const string denotion) const
 {
 	return term_1->eval(denotion) + term_2->eval(denotion);
 }
 
-void Add::print(ostream& out)
+void Add::print(ostream& out) const
 {
 	out << "(";
 	term_1->print(out);
@@ -120,17 +121,17 @@ void Add::print(ostream& out)
 	out << ")";
 }
 
-Expression* Add::copy()
+Expression* Add::copy() const
 {
 	return new Add(term_1->copy(), term_2->copy());
 }
 
-Expression* Add::derivative(string var)
+Expression* Add::derivative(const string var) const
 {
 	return new Add(term_1->derivative(var), term_2->derivative(var));
 }
 
-Expression* Add::reduce()
+Expression* Add::reduce() const
 {
 	Expression* term_1_reduced = this->term_1->reduce();
 	Expression* term_2_reduced = this->term_2->reduce();
@@ -155,9 +156,9 @@ Expression* Add::reduce()
 	return new Add(term_1_reduced, term_2_reduced);
 }
 
-bool Add::operator==(Expression* that)
+bool Add::operator==(const Expression* that) const
 {
-
+	throw "not implemented";
 }
 
 Add::~Add()
@@ -171,12 +172,12 @@ Sub::Sub(Expression* exp_1, Expression* exp_2) : term_1(exp_1), term_2(exp_2) {}
 
 Sub::Sub() : term_1(nullptr), term_2(nullptr) {}
 
-double Sub::eval(string denotion)
+double Sub::eval(const string denotion) const
 {
 	return term_1->eval(denotion) - term_2->eval(denotion);
 }
 
-void Sub::print(ostream& out)
+void Sub::print(ostream& out) const
 {
 	out << "(";
 	term_1->print(out);
@@ -185,17 +186,17 @@ void Sub::print(ostream& out)
 	out << ")";
 }
 
-Expression* Sub::copy()
+Expression* Sub::copy() const
 {
 	return new Sub(term_1->copy(), term_2->copy());
 }
 
-Expression* Sub::derivative(string var)
+Expression* Sub::derivative(const string var) const
 {
 	return new Sub(term_1->derivative(var), term_2->derivative(var));
 }
 
-Expression* Sub::reduce()
+Expression* Sub::reduce() const
 {
 	Expression* term_1_reduced = this->term_1->reduce();
 	Expression* term_2_reduced = this->term_2->reduce();
@@ -216,9 +217,9 @@ Expression* Sub::reduce()
 	return new Sub(term_1_reduced, term_2_reduced);
 }
 
-bool Sub::operator==(Expression* that)
+bool Sub::operator==(const Expression* that) const
 {
-
+	throw "not implemented";
 }
 
 Sub::~Sub()
@@ -232,12 +233,12 @@ Mul::Mul(Expression* exp_1, Expression* exp_2) : factor_1(exp_1), factor_2(exp_2
 
 Mul::Mul() : factor_1(nullptr), factor_2(nullptr) {}
 
-double Mul::eval(string denotion)
+double Mul::eval(const string denotion) const
 {
 	return factor_1->eval(denotion) * factor_2->eval(denotion);
 }
 
-void Mul::print(ostream& out)
+void Mul::print(ostream& out) const
 {
 	out << "(";
 	factor_1->print(out);
@@ -246,17 +247,17 @@ void Mul::print(ostream& out)
 	out << ")";
 }
 
-Expression* Mul::copy()
+Expression* Mul::copy() const
 {
 	return new Mul(factor_1->copy(), factor_2->copy());
 }
 
-Expression* Mul::derivative(string var)
+Expression* Mul::derivative(const string var) const
 {
 	return new Add(new Mul(factor_1->derivative(var), factor_2), new Mul(factor_1, factor_2->derivative(var)));
 }
 
-Expression* Mul::reduce()
+Expression* Mul::reduce() const
 {
 	Expression* factor_1_reduced = this->factor_1->reduce();
 	Expression* factor_2_reduced = this->factor_2->reduce();
@@ -295,9 +296,9 @@ Expression* Mul::reduce()
 	return new Mul(factor_1_reduced, factor_2_reduced);
 }
 
-bool Mul::operator==(Expression* that)
+bool Mul::operator==(const Expression* that) const
 {
-
+	throw "not implemented";
 }
 
 Mul::~Mul()
@@ -311,12 +312,12 @@ Div::Div(Expression* num, Expression* den) : numerator(num), denominator(den) {}
 
 Div::Div() : numerator(nullptr), denominator(nullptr) {}
 
-double Div::eval(string denotion)
+double Div::eval(const string denotion) const
 {
 	return numerator->eval(denotion) / denominator->eval(denotion);
 }
 
-void Div::print(ostream& out)
+void Div::print(ostream& out) const
 {
 	out << "(";
 	numerator->print(out);
@@ -325,17 +326,17 @@ void Div::print(ostream& out)
 	out << ")";
 }
 
-Expression* Div::copy()
+Expression* Div::copy() const
 {
 	return new Div(numerator->copy(), denominator->copy());
 }
 
-Expression* Div::derivative(string var)
+Expression* Div::derivative(const string var) const
 {
 	return new Div(new Sub(new Mul(numerator->derivative(var), denominator), new Mul(numerator, denominator->derivative(var))), new Mul(denominator, denominator));
 }
 
-Expression* Div::reduce()
+Expression* Div::reduce() const
 {
 	Expression* numerator_reduced = this->numerator->reduce();
 	Expression* denominator_reduced = this->denominator->reduce();
@@ -369,9 +370,9 @@ Expression* Div::reduce()
 	return new Div(numerator_reduced, denominator_reduced);
 }
 
-bool Div::operator==(Expression* that)
+bool Div::operator==(const Expression* that) const
 {
-
+	throw "not implemented";
 }
 
 Div::~Div()
