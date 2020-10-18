@@ -51,11 +51,21 @@ vector<string> ExpressionBuilder::split_into_tokens(string expression)
 
         else if (isdigit(expression[i]))
         {
+            size_t dots_counter = 0;
+
             new_token += expression[i];
             size_t j = 1;
 
-            while (isdigit(expression[i + j]))
+            while (isdigit(expression[i + j]) || expression[i + j] == '.')
             {
+                if (expression[i + j] == '.')
+                {
+                    if (dots_counter == 1)
+                    {
+                        throw "invalid token";
+                    }
+                    dots_counter++;
+                }
                 new_token += expression[i + j];
                 j++;
             }

@@ -7,7 +7,7 @@ using namespace std;
 
 Number::Number(): value(0.) {}
 
-Number::Number(const int val) : value(val * 1.0) {}
+Number::Number(const int val) : value(val * 1.) {}
 
 Number::Number(const double val) : value(val) {}
 
