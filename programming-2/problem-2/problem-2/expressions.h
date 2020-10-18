@@ -5,7 +5,6 @@ using namespace std;
 
 class Expression
 {
-
 public:
 	Expression() {}
 
@@ -16,6 +15,10 @@ public:
 	virtual Expression* derivative(string var) = 0;
 
 	virtual Expression* copy() = 0;
+
+	virtual Expression* reduce() = 0;
+
+	virtual bool operator==(Expression* that) = 0;
 };
 
 
@@ -36,6 +39,10 @@ public:
 
 	virtual Expression* derivative(string var);
 
+	virtual Expression* reduce();
+
+	virtual bool operator==(Expression* that);
+
 };
 
 
@@ -55,6 +62,10 @@ public:
 
 	virtual Expression* derivative(string var);
 
+	virtual Expression* reduce();
+
+	virtual bool operator==(Expression* that);
+
 };
 
 
@@ -65,8 +76,7 @@ class Add : public Expression
 
 	friend class Mul;
 	friend class Div;
-
-	friend Expression* build_expression(string source);
+	friend class ExpressionBuilder;
 
 	Add(Expression* exp_1, Expression* exp_2);
 
@@ -82,6 +92,10 @@ public:
 
 	virtual Expression* derivative(string var);
 
+	virtual Expression* reduce();
+
+	virtual bool operator==(Expression* that);
+
 	~Add();
 
 };
@@ -94,8 +108,7 @@ class Sub : public Expression
 
 	friend class Mul;
 	friend class Div;
-
-	friend Expression* build_expression(string source);
+	friend class ExpressionBuilder;
 
 	Sub(Expression* exp_1, Expression* exp_2);
 
@@ -111,6 +124,10 @@ public:
 
 	virtual Expression* derivative(string var);
 
+	virtual Expression* reduce();
+
+	virtual bool operator==(Expression* that);
+
 	~Sub();
 };
 
@@ -120,8 +137,8 @@ class Mul : public Expression
 	Expression* factor_1;
 	Expression* factor_2;
 
-	friend Expression* build_expression(string source);
 	friend class Div;
+	friend class ExpressionBuilder;
 
 	Mul(Expression* exp_1, Expression* exp_2);
 
@@ -137,6 +154,10 @@ public:
 
 	virtual Expression* derivative(string var);
 
+	virtual Expression* reduce();
+
+	virtual bool operator==(Expression* that);
+
 	~Mul();
 };
 
@@ -146,7 +167,7 @@ class Div : public Expression
 	Expression* numerator;
 	Expression* denominator;
 
-	friend Expression* build_expression(string source);
+	friend class ExpressionBuilder;
 	
 	Div(Expression* num, Expression* den);
 
@@ -161,8 +182,9 @@ public:
 
 	virtual Expression* derivative(string var);
 
+	virtual Expression* reduce();
+
+	virtual bool operator==(Expression* that);
+
 	~Div();
 };
-
-
-Expression* build_expression(string source);

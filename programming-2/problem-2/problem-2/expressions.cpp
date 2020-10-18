@@ -30,6 +30,19 @@ Expression* Number::derivative(string var)
 	return new Number(0);
 }
 
+Expression* Number::reduce()
+{
+	return this->copy();
+}
+
+bool Number::operator==(Expression* that)
+{
+	Expression* that_reduced = that->reduce();
+
+	Number* that_reduced_number = dynamic_cast<Number*>(that_reduced);
+
+	return (that_reduced_number && (that_reduced_number->value == this->value));
+}
 
 
 Variable::Variable(string var) : name(var) {}
@@ -74,6 +87,20 @@ Expression* Variable::derivative(string var)
 	}
 }
 
+Expression* Variable::reduce()
+{
+	return this->copy();
+}
+
+bool Variable::operator==(Expression* that)
+{
+	Expression* that_reduced = that->reduce();
+
+	Variable* that_reduced_number = dynamic_cast<Variable*>(that_reduced);
+
+	return (that_reduced_number && (that_reduced_number->name == this->name));
+}
+
 
 Add::Add(Expression* exp_1, Expression* exp_2) : term_1(exp_1), term_2(exp_2) {}
 
@@ -101,6 +128,36 @@ Expression* Add::copy()
 Expression* Add::derivative(string var)
 {
 	return new Add(term_1->derivative(var), term_2->derivative(var));
+}
+
+Expression* Add::reduce()
+{
+	Expression* term_1_reduced = this->term_1->reduce();
+	Expression* term_2_reduced = this->term_2->reduce();
+
+	Number* term_1_reduced_number = dynamic_cast<Number*>(term_1_reduced);
+	if (term_1_reduced_number && term_1_reduced_number->eval("") == 0)
+	{
+		return term_2_reduced;
+	}
+
+	Number* term_2_reduced_number = dynamic_cast<Number*>(term_2_reduced);
+	if (term_2_reduced_number && term_2_reduced_number->eval("") == 0)
+	{
+		return term_1_reduced;
+	}
+
+	if (term_1_reduced_number && term_2_reduced_number)
+	{
+		return new Number(term_1_reduced_number->eval("") + term_2_reduced_number->eval(""));
+	}
+
+	return new Add(term_1_reduced, term_2_reduced);
+}
+
+bool Add::operator==(Expression* that)
+{
+
 }
 
 Add::~Add()
@@ -138,6 +195,32 @@ Expression* Sub::derivative(string var)
 	return new Sub(term_1->derivative(var), term_2->derivative(var));
 }
 
+Expression* Sub::reduce()
+{
+	Expression* term_1_reduced = this->term_1->reduce();
+	Expression* term_2_reduced = this->term_2->reduce();
+
+	Number* term_2_reduced_number = dynamic_cast<Number*>(term_2_reduced);
+	if (term_2_reduced_number && term_2_reduced_number->eval("") == 0)
+	{
+		return term_1_reduced;
+	}
+
+	Number* term_1_reduced_number = dynamic_cast<Number*>(term_1_reduced);
+
+	if (term_1_reduced_number && term_2_reduced_number)
+	{
+		return new Number(term_1_reduced_number->eval("") - term_2_reduced_number->eval(""));
+	}
+
+	return new Sub(term_1_reduced, term_2_reduced);
+}
+
+bool Sub::operator==(Expression* that)
+{
+
+}
+
 Sub::~Sub()
 {
 	delete term_1;
@@ -171,6 +254,50 @@ Expression* Mul::copy()
 Expression* Mul::derivative(string var)
 {
 	return new Add(new Mul(factor_1->derivative(var), factor_2), new Mul(factor_1, factor_2->derivative(var)));
+}
+
+Expression* Mul::reduce()
+{
+	Expression* factor_1_reduced = this->factor_1->reduce();
+	Expression* factor_2_reduced = this->factor_2->reduce();
+
+	Number* factor_1_reduced_number = dynamic_cast<Number*>(factor_1_reduced);
+	if (factor_1_reduced_number)
+	{
+		if (factor_1_reduced_number->eval("") == 0)
+		{
+			return new Number(0);
+		}
+		else if (factor_1_reduced_number->eval("") == 1)
+		{
+			return factor_2_reduced;
+		}
+	}
+
+	Number* factor_2_reduced_number = dynamic_cast<Number*>(factor_2_reduced);
+	if (factor_2_reduced_number)
+	{
+		if (factor_2_reduced_number->eval("") == 0)
+		{
+			return new Number(0);
+		}
+		else if (factor_2_reduced_number->eval("") == 1)
+		{
+			return factor_1_reduced;
+		}
+	}
+
+	if (factor_1_reduced_number && factor_2_reduced_number)
+	{
+		return new Number(factor_1_reduced_number->eval("") * factor_2_reduced_number->eval(""));
+	}
+
+	return new Mul(factor_1_reduced, factor_2_reduced);
+}
+
+bool Mul::operator==(Expression* that)
+{
+
 }
 
 Mul::~Mul()
@@ -208,75 +335,47 @@ Expression* Div::derivative(string var)
 	return new Div(new Sub(new Mul(numerator->derivative(var), denominator), new Mul(numerator, denominator->derivative(var))), new Mul(denominator, denominator));
 }
 
+Expression* Div::reduce()
+{
+	Expression* numerator_reduced = this->numerator->reduce();
+	Expression* denominator_reduced = this->denominator->reduce();
+
+	Number* denominator_reduced_number = dynamic_cast<Number*>(denominator_reduced);
+	if (denominator_reduced_number && denominator_reduced_number->eval("") == 1)
+	{
+		return numerator_reduced;
+	}
+
+	Number* numerator_reduced_number = dynamic_cast<Number*>(numerator_reduced);
+	if (numerator_reduced_number && numerator_reduced_number->eval("") == 0)
+	{
+		if (denominator_reduced_number && denominator_reduced_number->eval("") != 0)
+		{
+			return new Number(0);
+		}
+		else
+		{
+			// division by zero can be here
+			return new Div(numerator_reduced, denominator_reduced);
+		}
+
+	}
+
+	if (numerator_reduced_number && denominator_reduced_number)
+	{
+		return new Number(numerator_reduced_number->eval("") / denominator_reduced_number->eval(""));
+	}
+
+	return new Div(numerator_reduced, denominator_reduced);
+}
+
+bool Div::operator==(Expression* that)
+{
+
+}
+
 Div::~Div()
 {
 	delete numerator;
 	delete denominator;
-}
-
-
-Expression* build_expression(string source)
-{
-	if (source.find('(') == string::npos)
-	{
-		try
-		{
-			double value = stod(source);
-			return new Number(value);
-		}
-		catch (invalid_argument)
-		{
-			return new Variable(source);
-		}
-	}
-
-	source = source.substr(1, source.length() - 2);
-
-	int counter = 0;
-	size_t main_operation_position = 0;
-
-	for (size_t i = 0; i < source.length(); i++)
-	{
-		if (source[i] == '(')
-		{
-			counter++;
-		}
-		if (source[i] == ')')
-		{
-			counter--;
-		}
-
-		if ((source[i] == '+' || source[i] == '-' || source[i] == '*' || source[i] == '/') && counter == 0)
-		{
-			main_operation_position = i;
-			break;
-		}
-	}
-
-	if (main_operation_position == 0)
-	{
-		throw "invalid expression";
-	}
-
-	string subexpression_1 = source.substr(0, main_operation_position);
-	string subexpression_2 = source.substr(main_operation_position + 1, source.length() - main_operation_position - 1);
-
-	if (source[main_operation_position] == '+')
-	{
-		return new Add(build_expression(subexpression_1), build_expression(subexpression_2));
-	}
-	if (source[main_operation_position] == '-')
-	{
-		return new Sub(build_expression(subexpression_1), build_expression(subexpression_2));
-	}
-	if (source[main_operation_position] == '*')
-	{
-		return new Mul(build_expression(subexpression_1), build_expression(subexpression_2));
-	}
-	if (source[main_operation_position] == '/')
-	{
-		return new Div(build_expression(subexpression_1), build_expression(subexpression_2));
-	}
-
-	throw "invalid operation";
 }

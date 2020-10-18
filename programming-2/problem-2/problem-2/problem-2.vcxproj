@@ -141,12 +141,14 @@
   <ItemGroup>
     <ClCompile Include="expressions.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="expression_builder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="expressions.h" />
+    <ClInclude Include="expression_builder.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
