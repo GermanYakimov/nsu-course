@@ -5,6 +5,7 @@ using namespace std;
 
 #include "expressions.h"
 
+
 Number::Number(): value(0.) {}
 
 Number::Number(const int val) : value(val * 1.) {}
@@ -44,6 +45,7 @@ bool Number::operator==(const Expression* that) const
 
 	return (that_reduced_number && (that_reduced_number->value == this->value));
 }
+
 
 
 Variable::Variable(const string var) : name(var) {}
@@ -103,38 +105,39 @@ bool Variable::operator==(const Expression* that) const
 }
 
 
-Add::Add(Expression* exp_1, Expression* exp_2) : term_1(exp_1), term_2(exp_2) {}
 
-Add::Add() : term_1(nullptr), term_2(nullptr) {}
+Add::Add(Expression* exp_1, Expression* exp_2) : left(exp_1), right(exp_2) {}
+
+Add::Add() : left(nullptr), right(nullptr) {}
 
 double Add::eval(const string denotion) const
 {
-	return term_1->eval(denotion) + term_2->eval(denotion);
+	return left->eval(denotion) + right->eval(denotion);
 }
 
 void Add::print(ostream& out) const
 {
 	out << "(";
-	term_1->print(out);
+	left->print(out);
 	out << "+";
-	term_2->print(out);
+	right->print(out);
 	out << ")";
 }
 
 Expression* Add::copy() const
 {
-	return new Add(term_1->copy(), term_2->copy());
+	return new Add(left->copy(), right->copy());
 }
 
 Expression* Add::derivative(const string var) const
 {
-	return new Add(term_1->derivative(var), term_2->derivative(var));
+	return new Add(left->derivative(var), right->derivative(var));
 }
 
 Expression* Add::reduce() const
 {
-	Expression* term_1_reduced = this->term_1->reduce();
-	Expression* term_2_reduced = this->term_2->reduce();
+	Expression* term_1_reduced = this->left->reduce();
+	Expression* term_2_reduced = this->right->reduce();
 
 	Number* term_1_reduced_number = dynamic_cast<Number*>(term_1_reduced);
 	if (term_1_reduced_number && term_1_reduced_number->eval("") == 0)
@@ -163,43 +166,44 @@ bool Add::operator==(const Expression* that) const
 
 Add::~Add()
 {
-	delete term_1;
-	delete term_2;
+	delete left;
+	delete right;
 }
 
 
-Sub::Sub(Expression* exp_1, Expression* exp_2) : term_1(exp_1), term_2(exp_2) {}
 
-Sub::Sub() : term_1(nullptr), term_2(nullptr) {}
+Sub::Sub(Expression* exp_1, Expression* exp_2) : left(exp_1), right(exp_2) {}
+
+Sub::Sub() : left(nullptr), right(nullptr) {}
 
 double Sub::eval(const string denotion) const
 {
-	return term_1->eval(denotion) - term_2->eval(denotion);
+	return left->eval(denotion) - right->eval(denotion);
 }
 
 void Sub::print(ostream& out) const
 {
 	out << "(";
-	term_1->print(out);
+	left->print(out);
 	out << "-";
-	term_2->print(out);
+	right->print(out);
 	out << ")";
 }
 
 Expression* Sub::copy() const
 {
-	return new Sub(term_1->copy(), term_2->copy());
+	return new Sub(left->copy(), right->copy());
 }
 
 Expression* Sub::derivative(const string var) const
 {
-	return new Sub(term_1->derivative(var), term_2->derivative(var));
+	return new Sub(left->derivative(var), right->derivative(var));
 }
 
 Expression* Sub::reduce() const
 {
-	Expression* term_1_reduced = this->term_1->reduce();
-	Expression* term_2_reduced = this->term_2->reduce();
+	Expression* term_1_reduced = this->left->reduce();
+	Expression* term_2_reduced = this->right->reduce();
 
 	Number* term_2_reduced_number = dynamic_cast<Number*>(term_2_reduced);
 	if (term_2_reduced_number && term_2_reduced_number->eval("") == 0)
@@ -224,43 +228,44 @@ bool Sub::operator==(const Expression* that) const
 
 Sub::~Sub()
 {
-	delete term_1;
-	delete term_2;
+	delete left;
+	delete right;
 }
 
 
-Mul::Mul(Expression* exp_1, Expression* exp_2) : factor_1(exp_1), factor_2(exp_2) {}
 
-Mul::Mul() : factor_1(nullptr), factor_2(nullptr) {}
+Mul::Mul(Expression* exp_1, Expression* exp_2) : left(exp_1), right(exp_2) {}
+
+Mul::Mul() : left(nullptr), right(nullptr) {}
 
 double Mul::eval(const string denotion) const
 {
-	return factor_1->eval(denotion) * factor_2->eval(denotion);
+	return left->eval(denotion) * right->eval(denotion);
 }
 
 void Mul::print(ostream& out) const
 {
 	out << "(";
-	factor_1->print(out);
+	left->print(out);
 	out << "*";
-	factor_2->print(out);
+	right->print(out);
 	out << ")";
 }
 
 Expression* Mul::copy() const
 {
-	return new Mul(factor_1->copy(), factor_2->copy());
+	return new Mul(left->copy(), right->copy());
 }
 
 Expression* Mul::derivative(const string var) const
 {
-	return new Add(new Mul(factor_1->derivative(var), factor_2), new Mul(factor_1, factor_2->derivative(var)));
+	return new Add(new Mul(left->derivative(var), right), new Mul(left, right->derivative(var)));
 }
 
 Expression* Mul::reduce() const
 {
-	Expression* factor_1_reduced = this->factor_1->reduce();
-	Expression* factor_2_reduced = this->factor_2->reduce();
+	Expression* factor_1_reduced = this->left->reduce();
+	Expression* factor_2_reduced = this->right->reduce();
 
 	Number* factor_1_reduced_number = dynamic_cast<Number*>(factor_1_reduced);
 	if (factor_1_reduced_number)
@@ -303,9 +308,10 @@ bool Mul::operator==(const Expression* that) const
 
 Mul::~Mul()
 {
-	delete factor_1;
-	delete factor_2;
+	delete left;
+	delete right;
 }
+
 
 
 Div::Div(Expression* num, Expression* den) : numerator(num), denominator(den) {}

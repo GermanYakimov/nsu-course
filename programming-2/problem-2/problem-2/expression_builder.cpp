@@ -86,14 +86,14 @@ vector<string> ExpressionBuilder::split_into_tokens(string expression)
 
 vector<string> ExpressionBuilder::build_reverse_polish_notation(vector<string> tokens)
 {
-    stack <string> st;
+    stack <string> stack_of_tokens;
     vector <string> rpn_tokens;
 
     for (size_t i = 0; i < tokens.size(); i++)
     {
         if (tokens[i] == "(")
         {
-            st.push(tokens[i]);
+            stack_of_tokens.push(tokens[i]);
             continue;
         }
 
@@ -105,42 +105,40 @@ vector<string> ExpressionBuilder::build_reverse_polish_notation(vector<string> t
 
         if (tokens[i] == ")")
         {
-            while (st.top() != "(")
+            while (stack_of_tokens.top() != "(")
             {
-                rpn_tokens.push_back(st.top());
-                st.pop();
+                rpn_tokens.push_back(stack_of_tokens.top());
+                stack_of_tokens.pop();
             }
 
-            st.pop();
+            stack_of_tokens.pop();
             continue;
         }
 
-        if (st.empty())
+        if (stack_of_tokens.empty())
         {
-            st.push(tokens[i]);
+            stack_of_tokens.push(tokens[i]);
         }
         else
         {
-            while (!st.empty() && (priority(st.top()[0]) >= priority(tokens[i][0])))
+            while (!stack_of_tokens.empty() && (priority(stack_of_tokens.top()[0]) >= priority(tokens[i][0])))
             {
-                rpn_tokens.push_back(st.top());
-                st.pop();
+                rpn_tokens.push_back(stack_of_tokens.top());
+                stack_of_tokens.pop();
             }
 
-            st.push(tokens[i]);
+            stack_of_tokens.push(tokens[i]);
         }
     }
 
-    while (!st.empty())
+    while (!stack_of_tokens.empty())
     {
-        rpn_tokens.push_back(st.top());
-        st.pop();
+        rpn_tokens.push_back(stack_of_tokens.top());
+        stack_of_tokens.pop();
     }
 
     return rpn_tokens;
 }
-
-ExpressionBuilder::ExpressionBuilder() {}
 
 string ExpressionBuilder::arrange_brackets(string expression)
 {

@@ -1,4 +1,5 @@
 #pragma once
+
 #include <fstream>
 
 using namespace std;
@@ -19,6 +20,7 @@ public:
 	virtual Expression* reduce() const = 0;
 
 	virtual bool operator==(const Expression* that) const = 0;
+
 };
 
 
@@ -73,8 +75,8 @@ public:
 
 class Add : public Expression
 {
-	Expression* term_1;
-	Expression* term_2;
+	Expression* left;
+	Expression* right;
 
 	friend class Mul;
 	friend class Div;
@@ -105,8 +107,8 @@ public:
 
 class Sub : public Expression
 {
-	Expression* term_1;
-	Expression* term_2;
+	Expression* left;
+	Expression* right;
 
 	friend class Mul;
 	friend class Div;
@@ -136,8 +138,8 @@ public:
 
 class Mul : public Expression
 {
-	Expression* factor_1;
-	Expression* factor_2;
+	Expression* left;
+	Expression* right;
 
 	friend class Div;
 	friend class ExpressionBuilder;

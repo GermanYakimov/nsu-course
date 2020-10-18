@@ -23,7 +23,5 @@ class ExpressionBuilder
 	string remove_spaces(string expression);
 
 public:
-	ExpressionBuilder();
-
 	Expression* build_expression(string expression);
 };
