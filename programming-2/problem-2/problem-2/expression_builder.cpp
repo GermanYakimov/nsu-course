@@ -62,7 +62,7 @@ vector<string> ExpressionBuilder::split_into_tokens(string expression)
                 {
                     if (dots_counter == 1)
                     {
-                        throw "invalid token";
+                        throw invalid_argument("invalid token");
                     }
                     dots_counter++;
                 }

@@ -9,9 +9,11 @@ class Expression
 public:
 	Expression() {}
 
-	virtual void print(ostream& out) const = 0;
+	virtual ostream& print(ostream& out) const;
 
 	virtual double eval(const string denotion) const = 0;
+
+	virtual string to_string() const = 0;
 
 	virtual Expression* derivative(const string var) const = 0;
 
@@ -42,7 +44,7 @@ public:
 
 	virtual double eval(const string denotion) const;
 
-	virtual void print(ostream& out) const;
+	virtual string to_string() const;
 
 	virtual Expression* copy() const;
 
@@ -65,7 +67,7 @@ public:
 
 	virtual double eval(const string denotion) const;
 
-	virtual void print(ostream& out) const;
+	virtual string to_string() const;
 
 	virtual Expression* copy() const;
 
@@ -95,7 +97,7 @@ public:
 
 	virtual double eval(const string denotion) const;
 
-	virtual void print(ostream& out) const;
+	virtual string to_string() const;
 
 	virtual Expression* copy() const;
 
@@ -126,8 +128,8 @@ public:
 	Sub();
 
 	virtual double eval(const string denotion) const;
-
-	virtual void print(ostream& out) const;
+	
+	virtual string to_string() const;
 
 	virtual Expression* copy() const;
 
@@ -157,7 +159,7 @@ public:
 
 	virtual double eval(const string denotion) const;
 
-	virtual void print(ostream& out) const;
+	virtual string to_string() const;
 
 	virtual Expression* copy() const;
 
@@ -185,7 +187,7 @@ public:
 
 	virtual double eval(const string denotion) const;
 
-	virtual void print(ostream& out) const;
+	virtual string to_string() const;
 
 	virtual Expression* copy() const;
 

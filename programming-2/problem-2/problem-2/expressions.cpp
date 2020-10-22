@@ -5,6 +5,12 @@ using namespace std;
 
 #include "expressions.h"
 
+ostream& Expression::print(ostream& out) const
+{
+	out << this->to_string();
+	return out;
+}
+
 
 Number::Number(): value(0.) {}
 
@@ -17,9 +23,9 @@ double Number::eval(const string denotion) const
 	return this->value;
 }
 
-void Number::print(ostream& out)  const
+string Number::to_string() const
 {
-	out << value;
+	return std::to_string(this->value);
 }
 
 Expression* Number::copy()  const
@@ -72,9 +78,9 @@ double Variable::eval(const string denotion) const
 	return value_num;
 }
 
-void Variable::print(ostream& out) const
+string Variable::to_string() const
 {
-	out << name;
+	return this->name;
 }
 
 Expression* Variable::copy() const
@@ -88,6 +94,7 @@ Expression* Variable::derivative(const string var) const
 	{
 		return new Number(1);
 	}
+	return new Number(0);
 }
 
 Expression* Variable::reduce() const
@@ -115,13 +122,9 @@ double Add::eval(const string denotion) const
 	return left->eval(denotion) + right->eval(denotion);
 }
 
-void Add::print(ostream& out) const
+string Add::to_string() const
 {
-	out << "(";
-	left->print(out);
-	out << "+";
-	right->print(out);
-	out << ")";
+	return this->left->to_string() + "+" + this->right->to_string();
 }
 
 Expression* Add::copy() const
@@ -181,13 +184,9 @@ double Sub::eval(const string denotion) const
 	return left->eval(denotion) - right->eval(denotion);
 }
 
-void Sub::print(ostream& out) const
+string Sub::to_string() const
 {
-	out << "(";
-	left->print(out);
-	out << "-";
-	right->print(out);
-	out << ")";
+	return this->left->to_string() + "-" + this->right->to_string();
 }
 
 Expression* Sub::copy() const
@@ -218,6 +217,11 @@ Expression* Sub::reduce() const
 		return new Number(term_1_reduced_number->value - term_2_reduced_number->value);
 	}
 
+	if (term_1_reduced->to_string() == term_2_reduced->to_string())
+	{
+		return new Number(0);
+	}
+
 	return new Sub(term_1_reduced, term_2_reduced);
 }
 
@@ -243,13 +247,9 @@ double Mul::eval(const string denotion) const
 	return left->eval(denotion) * right->eval(denotion);
 }
 
-void Mul::print(ostream& out) const
+string Mul::to_string() const
 {
-	out << "(";
-	left->print(out);
-	out << "*";
-	right->print(out);
-	out << ")";
+	return this->left->to_string() + "*" + this->right->to_string();
 }
 
 Expression* Mul::copy() const
@@ -323,13 +323,9 @@ double Div::eval(const string denotion) const
 	return numerator->eval(denotion) / denominator->eval(denotion);
 }
 
-void Div::print(ostream& out) const
+string Div::to_string() const
 {
-	out << "(";
-	numerator->print(out);
-	out << "/";
-	denominator->print(out);
-	out << ")";
+	return this->numerator->to_string() + "/" + this->denominator->to_string();
 }
 
 Expression* Div::copy() const

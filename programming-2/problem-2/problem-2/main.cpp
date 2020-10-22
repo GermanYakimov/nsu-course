@@ -22,19 +22,14 @@ int main()
 	d->print(output);
 	output.close();
 
-	Expression* d_re = d->reduce();
+	Expression* d_re = exp->reduce();
 
 	d_re->print(cout);
 	cout << endl;
-	Expression* d_d = d_re->derivative("x");
-	Expression* d_d_re = d_d->reduce();
-	d_d_re->print(cout);
 
 	delete exp;
 	delete d;
 	delete d_re;
-	delete d_d_re;
-	delete d_d;
 
 	return EXIT_SUCCESS;
 }
