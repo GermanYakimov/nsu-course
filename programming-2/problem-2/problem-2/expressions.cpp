@@ -43,16 +43,6 @@ Expression* Number::reduce()  const
 	return this->copy();
 }
 
-bool Number::operator==(const Expression* that) const
-{
-	Expression* that_reduced = that->reduce();
-
-	Number* that_reduced_number = dynamic_cast<Number*>(that_reduced);
-
-	return (that_reduced_number && (that_reduced_number->value == this->value));
-}
-
-
 
 Variable::Variable(const string var) : name(var) {}
 
@@ -101,16 +91,6 @@ Expression* Variable::reduce() const
 {
 	return this->copy();
 }
-
-bool Variable::operator==(const Expression* that) const
-{
-	Expression* that_reduced = that->reduce();
-
-	Variable* that_reduced_number = dynamic_cast<Variable*>(that_reduced);
-
-	return (that_reduced_number && (that_reduced_number->name == this->name));
-}
-
 
 
 Add::Add(Expression* exp_1, Expression* exp_2) : left(exp_1), right(exp_2) {}
@@ -162,17 +142,11 @@ Expression* Add::reduce() const
 	return new Add(term_1_reduced, term_2_reduced);
 }
 
-bool Add::operator==(const Expression* that) const
-{
-	throw "not implemented";
-}
-
 Add::~Add()
 {
 	delete left;
 	delete right;
 }
-
 
 
 Sub::Sub(Expression* exp_1, Expression* exp_2) : left(exp_1), right(exp_2) {}
@@ -225,17 +199,11 @@ Expression* Sub::reduce() const
 	return new Sub(term_1_reduced, term_2_reduced);
 }
 
-bool Sub::operator==(const Expression* that) const
-{
-	throw "not implemented";
-}
-
 Sub::~Sub()
 {
 	delete left;
 	delete right;
 }
-
 
 
 Mul::Mul(Expression* exp_1, Expression* exp_2) : left(exp_1), right(exp_2) {}
@@ -301,17 +269,11 @@ Expression* Mul::reduce() const
 	return new Mul(factor_1_reduced, factor_2_reduced);
 }
 
-bool Mul::operator==(const Expression* that) const
-{
-	throw "not implemented";
-}
-
 Mul::~Mul()
 {
 	delete left;
 	delete right;
 }
-
 
 
 Div::Div(Expression* num, Expression* den) : numerator(num), denominator(den) {}
@@ -370,11 +332,6 @@ Expression* Div::reduce() const
 	}
 
 	return new Div(numerator_reduced, denominator_reduced);
-}
-
-bool Div::operator==(const Expression* that) const
-{
-	throw "not implemented";
 }
 
 Div::~Div()

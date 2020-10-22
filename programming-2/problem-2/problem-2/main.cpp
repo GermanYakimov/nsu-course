@@ -22,14 +22,5 @@ int main()
 	d->print(output);
 	output.close();
 
-	Expression* d_re = exp->reduce();
-
-	d_re->print(cout);
-	cout << endl;
-
-	delete exp;
-	delete d;
-	delete d_re;
-
 	return EXIT_SUCCESS;
 }

@@ -21,8 +21,6 @@ public:
 
 	virtual Expression* reduce() const = 0;
 
-	virtual bool operator==(const Expression* that) const = 0;
-
 };
 
 
@@ -52,8 +50,6 @@ public:
 
 	virtual Expression* reduce() const;
 
-	virtual bool operator==(const Expression* that) const;
-
 };
 
 
@@ -74,8 +70,6 @@ public:
 	virtual Expression* derivative(const string var) const;
 
 	virtual Expression* reduce() const;
-
-	virtual bool operator==(const Expression* that) const;
 
 };
 
@@ -104,8 +98,6 @@ public:
 	virtual Expression* derivative(const string var) const;
 
 	virtual Expression* reduce() const;
-
-	virtual bool operator==(const Expression* that) const;
 
 	~Add();
 
@@ -137,8 +129,6 @@ public:
 
 	virtual Expression* reduce() const;
 
-	virtual bool operator==(const Expression* that) const;
-
 	~Sub();
 };
 
@@ -167,8 +157,6 @@ public:
 
 	virtual Expression* reduce() const;
 
-	virtual bool operator==(const Expression* that) const;
-
 	~Mul();
 };
 
@@ -194,8 +182,6 @@ public:
 	virtual Expression* derivative(const string var) const;
 
 	virtual Expression* reduce() const;
-
-	virtual bool operator==(const Expression* that) const;
 
 	~Div();
 };
