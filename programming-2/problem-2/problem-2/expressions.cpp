@@ -140,20 +140,20 @@ Expression* Add::reduce() const
 	Expression* term_2_reduced = this->right->reduce();
 
 	Number* term_1_reduced_number = dynamic_cast<Number*>(term_1_reduced);
-	if (term_1_reduced_number && term_1_reduced_number->eval("") == 0)
+	if (term_1_reduced_number && term_1_reduced_number->value == 0)
 	{
 		return term_2_reduced;
 	}
 
 	Number* term_2_reduced_number = dynamic_cast<Number*>(term_2_reduced);
-	if (term_2_reduced_number && term_2_reduced_number->eval("") == 0)
+	if (term_2_reduced_number && term_2_reduced_number->value == 0)
 	{
 		return term_1_reduced;
 	}
 
 	if (term_1_reduced_number && term_2_reduced_number)
 	{
-		return new Number(term_1_reduced_number->eval("") + term_2_reduced_number->eval(""));
+		return new Number(term_1_reduced_number->value + term_2_reduced_number->value);
 	}
 
 	return new Add(term_1_reduced, term_2_reduced);
@@ -206,7 +206,7 @@ Expression* Sub::reduce() const
 	Expression* term_2_reduced = this->right->reduce();
 
 	Number* term_2_reduced_number = dynamic_cast<Number*>(term_2_reduced);
-	if (term_2_reduced_number && term_2_reduced_number->eval("") == 0)
+	if (term_2_reduced_number && term_2_reduced_number->value == 0)
 	{
 		return term_1_reduced;
 	}
@@ -215,7 +215,7 @@ Expression* Sub::reduce() const
 
 	if (term_1_reduced_number && term_2_reduced_number)
 	{
-		return new Number(term_1_reduced_number->eval("") - term_2_reduced_number->eval(""));
+		return new Number(term_1_reduced_number->value - term_2_reduced_number->value);
 	}
 
 	return new Sub(term_1_reduced, term_2_reduced);
@@ -348,15 +348,15 @@ Expression* Div::reduce() const
 	Expression* denominator_reduced = this->denominator->reduce();
 
 	Number* denominator_reduced_number = dynamic_cast<Number*>(denominator_reduced);
-	if (denominator_reduced_number && denominator_reduced_number->eval("") == 1)
+	if (denominator_reduced_number && denominator_reduced_number->value == 1)
 	{
 		return numerator_reduced;
 	}
 
 	Number* numerator_reduced_number = dynamic_cast<Number*>(numerator_reduced);
-	if (numerator_reduced_number && numerator_reduced_number->eval("") == 0)
+	if (numerator_reduced_number && numerator_reduced_number->value == 0)
 	{
-		if (denominator_reduced_number && denominator_reduced_number->eval("") != 0)
+		if (denominator_reduced_number && denominator_reduced_number->value != 0)
 		{
 			return new Number(0);
 		}
@@ -370,7 +370,7 @@ Expression* Div::reduce() const
 
 	if (numerator_reduced_number && denominator_reduced_number)
 	{
-		return new Number(numerator_reduced_number->eval("") / denominator_reduced_number->eval(""));
+		return new Number(numerator_reduced_number->value / denominator_reduced_number->value);
 	}
 
 	return new Div(numerator_reduced, denominator_reduced);

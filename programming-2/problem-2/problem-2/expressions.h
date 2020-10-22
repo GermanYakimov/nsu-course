@@ -28,6 +28,11 @@ class Number : public Expression
 {
 	double value;
 
+	friend class Add;
+	friend class Sub;
+	friend class Mul;
+	friend class Div;
+
 public:
 	Number();
 
