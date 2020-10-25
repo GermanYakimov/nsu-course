@@ -1,7 +1,7 @@
 #include <stack>
 
-#include "expression_builder.h"
 #include "expressions.h"
+
 
 short ExpressionBuilder::priority(const char token)
 {
@@ -17,7 +17,7 @@ short ExpressionBuilder::priority(const char token)
     case '-':
         return 3;
 
-    case '*':
+	case '*':
     case '/':
         return 4;
 
@@ -206,7 +206,7 @@ Expression* ExpressionBuilder::build(string expression)
 
 	if (main_operation_position == 0)
 	{
-		throw "invalid expression";
+		throw invalid_argument("invalid expression");
 	}
 
 	string subexpression_1 = expression.substr(0, main_operation_position);
@@ -229,7 +229,7 @@ Expression* ExpressionBuilder::build(string expression)
 		return new Div(build_expression(subexpression_1), build_expression(subexpression_2));
 	}
 
-	throw "invalid operation";
+	throw invalid_argument("invalid operation");
 }
 
 string ExpressionBuilder::remove_spaces(string expression)

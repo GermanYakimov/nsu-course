@@ -139,16 +139,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="expressions.cpp" />
+    <ClCompile Include="Add.cpp" />
+    <ClCompile Include="BinaryOperation.cpp" />
+    <ClCompile Include="Div.cpp" />
+    <ClCompile Include="Expression.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="expression_builder.cpp" />
+    <ClCompile Include="ExpressionBuilder.cpp" />
+    <ClCompile Include="Mul.cpp" />
+    <ClCompile Include="Number.cpp" />
+    <ClCompile Include="Sub.cpp" />
+    <ClCompile Include="Variable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Add.h" />
+    <ClInclude Include="BinaryOperation.h" />
+    <ClInclude Include="Div.h" />
+    <ClInclude Include="Expression.h" />
+    <ClInclude Include="ExpressionBuilder.h" />
     <ClInclude Include="expressions.h" />
-    <ClInclude Include="expression_builder.h" />
+    <ClInclude Include="Mul.h" />
+    <ClInclude Include="Number.h" />
+    <ClInclude Include="Sub.h" />
+    <ClInclude Include="Variable.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
