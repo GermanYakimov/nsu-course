@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 using namespace std;
 
 
@@ -79,6 +80,7 @@ public:
 		{
 			prev = current;
 			current = current->next;
+
 			delete prev;
 		}
 	}
@@ -87,23 +89,83 @@ public:
 template <typename K, typename V>
 class HashMap
 {
+	vector<List*> data;
+	static const size_t default_size = 10000;
+	static const size_t portion = 5000;
+	size_t current_size, filled;
+
 	size_t get_index(K key)
 	{
+		return hash(key) % current_size;
+	}
 
+	bool need_to_resize()
+	{
+		return filled / current_size > 0.7);
+	}
+
+	void resize()
+	{
+		this->data.resize(this->current_size + portion);
+		this->current_size = this->current_size + portion;
 	}
 
 public:
+	HashMap(): current_size(default_size)
+	{
+		data.resize(default_size);
+		fill(data.begin(), data.end(), nullptr);
+	}
+
 	V get(K key)
 	{
+		size_t index = this->get_index(key);
 
+		if (!this->data[index])
+		{
+			throw invalid_argument("Element with given key doesn't exist.")
+		}
+		else
+		{
+			return this->data[index]->get(key);
+		}
 	}
 
 	void remove(K key)
 	{
+		size_t index = this->get_index(key);
 
+		if (!this->data[index])
+		{
+			throw invalid_argument("Element with given key doesn't exist.")
+		}
+		else
+		{
+			this->data[index]->remove(key);
+		}
 	}
 
 	void add(K key, V value)
+	{
+		size_t index = this->get_index(key);
+
+		if (!this->data[index])
+		{
+			this->data[index] = new List<K, V>(key, value);
+			filled++;
+
+			if (this->need_to_resize())
+			{
+				this->resize();
+			}
+		}
+		else
+		{
+			this->data[index]->append(key, value);
+		}
+	}
+
+	~HashMap()
 	{
 
 	}
