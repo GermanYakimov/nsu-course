@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <fstream>
 using namespace std;
 
 template <typename K, typename V>
@@ -217,32 +218,39 @@ public:
 };
 
 
+template <typename K>
+K read_key(istream& input)
+{
+
+}
+
+template <typename V>
+V read_value(istream& input)
+{
+
+}
+
 int main()
 {
-	HashMap<string, double> A;
-	A.add("hello_1", 1.);
-	A.add("hello_2", 2.);
-	A.add("hello_3", 3.);
+	ifstream input("input.txt");
+	char k_type, v_type;
+	input >> k_type >> v_type;
+	cout << k_type << " " << v_type;
 
-	cout << A.get("hello_1") << endl;
-	cout << A.get("hello_2") << endl;
-	cout << A.get("hello_3") << endl;
-	cout << endl;
-
-	A.add("hello_1", 5.);
-	A.add("hello_2", 6.);
-	A.add("hello_3", 7.);
-
-	cout << A.get("hello_1") << endl;
-	cout << A.get("hello_2") << endl;
-	cout << A.get("hello_3") << endl;
-	cout << endl;
-
-	A.remove("hello_1");
-
-	// cout << A.get("hello_1") << endl;
-	cout << A.get("hello_2") << endl;
-	cout << A.get("hello_3") << endl;
+	switch (k_type)
+	{
+	case 'I':
+		int key;
+		break;
+	case 'D':
+		double key;
+		break;
+	case 'S':
+		string key;
+		break;
+	default:
+		throw invalid_argument("Incorrect key type.");
+	}
 
 	return EXIT_SUCCESS;
 }
