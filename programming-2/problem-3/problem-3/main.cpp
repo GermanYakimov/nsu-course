@@ -41,6 +41,8 @@ void do_commands(istream& input, size_t commands_number)
 		cout << iter.get_key() << " " << iter.get_value() << endl;
 	}
 
+	cout << b.get_key() << " " << b.get_value() << endl;
+
 	cout << dict.size() << " " << dict.unique_elements() << endl;
 }
 

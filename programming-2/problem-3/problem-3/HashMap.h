@@ -46,12 +46,13 @@ public:
 		friend const Iterator& operator++(Iterator& it, int)
 		{
 			K next;
+			Iterator it_copy = it;
 
 			try
 			{
 				next = (*(it.iter))->get_next_key(it.key);
 				it = Iterator(it.key, it.iter, it.end);
-				return Iterator(it.key, it.iter, it.end);
+				return it_copy;
 			}
 			catch (exception)
 			{
@@ -60,7 +61,7 @@ public:
 					if ((*i) && ((*i)->size() > 0))
 					{
 						it = Iterator((*i)->get_head_key(), i, it.end);
-						return Iterator((*i)->get_head_key(), i, it.end);
+						return it_copy;
 					}
 				}
 			}
