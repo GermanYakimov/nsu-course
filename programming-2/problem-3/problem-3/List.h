@@ -6,13 +6,15 @@
 
 using namespace std;
 
+#include "HashMap.h"
+
 template <typename K, typename V>
 class List
 {
 	Node<K, V>* head;
 	size_t elements;
 
-	Node<K, V>* get_pointer(K key)
+	Node<K, V>* get_pointer(K key) const
 	{
 		Node<K, V>* tmp = this->head;
 
@@ -39,12 +41,21 @@ public:
 
 	List(K key, V value) : head(new Node<K, V>(key, value, nullptr)), elements(1) {}
 
-	size_t size()
+	size_t size() const
 	{
 		return this->elements;
 	}
 
-	V get(K key)
+	//K get_head_key() const
+	//{
+	//	if (head)
+	//	{
+	//		return head->key;
+	//	}
+	//	throw "list is empty";
+	//}
+
+	V get(K key) const
 	{
 		Node<K, V>* tmp = this->head;
 
@@ -60,7 +71,30 @@ public:
 		throw invalid_argument("Node with given key doesn't exist.");
 	}
 
-	set<V> unique_elements()
+	//K get_next_key(K key)
+	//{
+	//	Node<K, V>* tmp = this->head;
+
+	//	while (tmp)
+	//	{
+	//		if (tmp->key == key)
+	//		{
+	//			if (tmp->next)
+	//			{
+	//				return tmp->next->key;
+	//			}
+	//			else
+	//			{
+	//				throw "next doesn't exist"; // change it to exception here
+	//			}
+	//		}
+	//		tmp = tmp->next;
+	//	}
+
+	//	throw invalid_argument("Node with given key doesn't exist.");
+	//}
+
+	set<V> unique_elements() const
 	{
 		set<V> result;
 		Node<K, V>* tmp = this->head;
