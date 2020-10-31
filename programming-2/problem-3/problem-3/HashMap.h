@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <iostream>
+#include <iterator>
 
 #include "List.h"
 
@@ -33,45 +34,78 @@ class HashMap
 
 public:
 
-	//class Iterator
-	//{
-	//	K key;
-	//	vector<List<K, V>*>::iterator iter;
+	class Iterator
+	{
+		K key;
+		typename vector<List<K, V>*>::iterator iter;
+		typename vector<List<K, V>*>::iterator end;
 
-	//public:
-	//	Iterator(K k, vector<List<K, V>*>::iterator i): key(k), iter(i) {}
+	public:
+		Iterator(K k, typename vector<List<K, V>*>::iterator i, typename vector<List<K, V>*>::iterator e) : key(k), iter(i), end(e) {}
 
-	//	Iterator operator++()
-	//	{
-	//		K next;
+		friend const Iterator& operator++(Iterator& it, int)
+		{
+			K next;
 
-	//		try 
-	//		{
-	//			next = *iter->get_next_key(key);
-	//			return { next, this->iter };
-	//		}
-	//		catch
-	//		{
-	//			for (vector<List<K, V>*>::iterator i = this->iter; i != )
-	//		}
-	//	}
-	//};
+			try
+			{
+				next = (*(it.iter))->get_next_key(it.key);
+				it = Iterator(it.key, it.iter, it.end);
+				return Iterator(it.key, it.iter, it.end);
+			}
+			catch (exception)
+			{
+				for (typename vector<List<K, V>*>::iterator i = it.iter + 1; i != it.end; i++)
+				{
+					if ((*i) && ((*i)->size() > 0))
+					{
+						it = Iterator((*i)->get_head_key(), i, it.end);
+						return Iterator((*i)->get_head_key(), i, it.end);
+					}
+				}
+			}
+		}
 
-	//Iterator begin()
-	//{
-	//	for (size_t i = 0; i < this->data.size(); i++)
-	//	{
-	//		if (this->data[i] && this->data[i]->size() > 0)
-	//		{
-	//			return Iterator(this->data[i]->get_head_key());
-	//		}
-	//	}
-	//}
+		friend bool operator!=(const Iterator& one, const Iterator& two)
+		{
+			return one.iter != two.iter || one.key != two.key;
+		}
 
-	//Iterator end()
-	//{
+		K get_key()
+		{
+			return this->key;
+		}
 
-	//}
+		V get_value()
+		{
+			return (*(this->iter))->get(this->key);
+		}
+	};
+
+	Iterator begin()
+	{
+		for (size_t i = 0; i < this->data.size(); i++)
+		{
+			if (this->data[i] && this->data[i]->size() > 0)
+			{
+				return Iterator(this->data[i]->get_head_key(), this->data.begin() + i, this->data.end());
+			}
+		}
+	}
+
+	Iterator end()
+	{
+		size_t index;
+		for (size_t i = 0; i < this->data.size(); i++)
+		{
+			if (this->data[i] && (this->data[i]->size() > 0))
+			{
+				index = i;
+			}
+		}
+
+		return Iterator(this->data[index]->get_tail_key(), this->data.begin() + index, this->data.end());
+	}
 
 	HashMap() : load_factor(0.7)
 	{

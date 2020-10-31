@@ -34,6 +34,13 @@ void do_commands(istream& input, size_t commands_number)
 		}
 	}
 
+	typename HashMap<K, V>::Iterator b = dict.end();
+
+	for (typename HashMap<K, V>::Iterator iter = dict.begin(); iter != dict.end(); iter++)
+	{
+		cout << iter.get_key() << " " << iter.get_value() << endl;
+	}
+
 	cout << dict.size() << " " << dict.unique_elements() << endl;
 }
 
