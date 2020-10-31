@@ -142,6 +142,7 @@
     <ClCompile Include="HashMap.cpp" />
     <ClCompile Include="List.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Node.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HashMap.h" />

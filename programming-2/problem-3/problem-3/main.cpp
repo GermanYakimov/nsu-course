@@ -2,6 +2,8 @@
 #include <vector>
 using namespace std;
 
+template <typename K, typename V>
+class List;
 
 template <typename K, typename V>
 class Node
@@ -10,7 +12,7 @@ class Node
 	V value;
 	Node* next;
 
-	friend class List;
+	friend class List<K, V>;
 
 	Node(K k, V v, Node* next) : key(k), value(v), next(next) {}
 };
@@ -19,6 +21,28 @@ template <typename K, typename V>
 class List
 {
 	Node<K, V>* head;
+
+	Node<K, V>* get_pointer(K key)
+	{
+		Node<K, V>* tmp = this->head;
+
+		while (tmp)
+		{
+			if (tmp->key == key)
+			{
+				return tmp;
+			}
+			tmp = tmp->next;
+		}
+
+		return nullptr;
+	}
+
+	void append(K key, V value)
+	{
+		Node<K, V>* new_element = new Node<K, V>(key, value, this->head);
+		this->head = new_element;
+	}
 
 public:
 	List() : head(nullptr) {}
@@ -41,10 +65,18 @@ public:
 		throw invalid_argument("Node with given key doesn't exist.");
 	}
 
-	void append(K key, V value)
+	void rewrite_or_add(K key, V value)
 	{
-		Node<K, V>* new_element = new Node<K, V>(key, value, this->head);
-		this->head = new_element;
+		Node<K, V>* element = this->get_pointer(key);
+
+		if (!element)
+		{
+			this->append(key, value);
+		}
+		else
+		{
+			element->value = value;
+		}
 	}
 
 	void remove(K key)
@@ -59,9 +91,14 @@ public:
 				if (prev)
 				{
 					prev->next = current->next;
-					delete current;
+				}
+				else
+				{
+					this->head = current->next;
 				}
 
+				delete current;
+				return;
 			}
 
 			prev = current;
@@ -89,19 +126,21 @@ public:
 template <typename K, typename V>
 class HashMap
 {
-	vector<List*> data;
+	vector<List<K, V>*> data;
+	hash<K> hasher;
+
 	static const size_t default_size = 10000;
 	static const size_t portion = 5000;
 	size_t current_size, filled;
 
 	size_t get_index(K key)
 	{
-		return hash(key) % current_size;
+		return this->hasher(key) % current_size;
 	}
 
 	bool need_to_resize()
 	{
-		return filled / current_size > 0.7);
+		return filled / current_size > 0.7;
 	}
 
 	void resize()
@@ -111,7 +150,7 @@ class HashMap
 	}
 
 public:
-	HashMap(): current_size(default_size)
+	HashMap(): current_size(default_size), filled(0)
 	{
 		data.resize(default_size);
 		fill(data.begin(), data.end(), nullptr);
@@ -123,7 +162,7 @@ public:
 
 		if (!this->data[index])
 		{
-			throw invalid_argument("Element with given key doesn't exist.")
+			throw invalid_argument("Element with given key doesn't exist.");
 		}
 		else
 		{
@@ -137,7 +176,7 @@ public:
 
 		if (!this->data[index])
 		{
-			throw invalid_argument("Element with given key doesn't exist.")
+			throw invalid_argument("Element with given key doesn't exist.");
 		}
 		else
 		{
@@ -161,12 +200,49 @@ public:
 		}
 		else
 		{
-			this->data[index]->append(key, value);
+			this->data[index]->rewrite_or_add(key, value);
 		}
 	}
 
 	~HashMap()
 	{
-
+		for (size_t i = 0; i < this->current_size; i++)
+		{
+			if (this->data[i])
+			{
+				delete this->data[i];
+			}
+		}
 	}
 };
+
+
+int main()
+{
+	HashMap<string, double> A;
+	A.add("hello_1", 1.);
+	A.add("hello_2", 2.);
+	A.add("hello_3", 3.);
+
+	cout << A.get("hello_1") << endl;
+	cout << A.get("hello_2") << endl;
+	cout << A.get("hello_3") << endl;
+	cout << endl;
+
+	A.add("hello_1", 5.);
+	A.add("hello_2", 6.);
+	A.add("hello_3", 7.);
+
+	cout << A.get("hello_1") << endl;
+	cout << A.get("hello_2") << endl;
+	cout << A.get("hello_3") << endl;
+	cout << endl;
+
+	A.remove("hello_1");
+
+	// cout << A.get("hello_1") << endl;
+	cout << A.get("hello_2") << endl;
+	cout << A.get("hello_3") << endl;
+
+	return EXIT_SUCCESS;
+}
