@@ -1,7 +1,8 @@
+#pragma once
 #include <vector>
 #include <iostream>
 
-#include "List.cpp"
+#include "List.h"
 
 using namespace std;
 

@@ -3,7 +3,7 @@
 #include <set>
 #include <fstream>
 
-#include "HashMap.cpp"
+#include "HashMap.h"
 using namespace std;
 
 template <typename K, typename V>
