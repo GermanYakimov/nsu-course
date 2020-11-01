@@ -36,52 +36,54 @@ public:
 
 	class Iterator
 	{
-		K key;
+		size_t list_index;
 		typename vector<List<K, V>*>::iterator iter;
 		typename vector<List<K, V>*>::iterator end;
 
 	public:
-		Iterator(K k, typename vector<List<K, V>*>::iterator i, typename vector<List<K, V>*>::iterator e) : key(k), iter(i), end(e) {}
+		Iterator(size_t idx, typename vector<List<K, V>*>::iterator i, typename vector<List<K, V>*>::iterator e) : list_index(idx), iter(i), end(e) {}
 
 		friend const Iterator& operator++(Iterator& it, int)
 		{
-			K next;
 			Iterator it_copy = it;
 
-			try
+			if (it.list_index < (*(it.iter))->size() - 1)
 			{
-				next = (*(it.iter))->get_next_key(it.key);
-				it = Iterator(it.key, it.iter, it.end);
+				it = Iterator(it.list_index + 1, it.iter, it.end);
 				return it_copy;
 			}
-			catch (exception)
+
+			for (typename vector<List<K, V>*>::iterator i = it.iter + 1; i != it.end; i++)
 			{
-				for (typename vector<List<K, V>*>::iterator i = it.iter + 1; i != it.end; i++)
+				if ((*i) && ((*i)->size() > 0))
 				{
-					if ((*i) && ((*i)->size() > 0))
-					{
-						it = Iterator((*i)->get_head_key(), i, it.end);
-						return it_copy;
-					}
+					it = Iterator(0, i, it.end);
+					return it_copy;
 				}
 			}
 		}
 
+		friend bool operator==(const Iterator& one, const Iterator& two)
+		{
+			return one.iter == two.iter && one.list_index == two.list_index;
+		}
+
 		friend bool operator!=(const Iterator& one, const Iterator& two)
 		{
-			return one.iter != two.iter || one.key != two.key;
+			return one.iter != two.iter || one.list_index != two.list_index;
 		}
 
 		K get_key()
 		{
-			return this->key;
+			return (*(this->iter))->get_key(this->list_index);
 		}
 
 		V get_value()
 		{
-			return (*(this->iter))->get(this->key);
+			return (*(this->iter))->get_value(this->list_index);
 		}
 	};
+
 
 	Iterator begin()
 	{
@@ -89,15 +91,18 @@ public:
 		{
 			if (this->data[i] && this->data[i]->size() > 0)
 			{
-				return Iterator(this->data[i]->get_head_key(), this->data.begin() + i, this->data.end());
+				return Iterator(0, this->data.begin() + i, this->data.end());
 			}
 		}
+
+		return Iterator(0, this->data.begin(), this->data.begin());
 	}
 
 	Iterator end()
 	{
-		size_t index;
-		for (size_t i = 0; i < this->data.size(); i++)
+		size_t index = 0;
+
+		for (size_t i = 1; i < this->data.size(); i++)
 		{
 			if (this->data[i] && (this->data[i]->size() > 0))
 			{
@@ -105,7 +110,12 @@ public:
 			}
 		}
 
-		return Iterator(this->data[index]->get_tail_key(), this->data.begin() + index, this->data.end());
+		if (!index && !this->data[0])
+		{
+			return Iterator(0, this->data.begin(), this->data.begin());
+		}
+
+		return Iterator(this->data[index]->size() - 1, this->data.begin() + index, this->data.end());
 	}
 
 	HashMap() : load_factor(0.7)
@@ -165,6 +175,12 @@ public:
 		if (this->data[index])
 		{
 			this->data[index]->remove(key);
+
+			if (!this->data[index]->size())
+			{
+				delete this->data[index];
+				this->data[index] = nullptr;
+			}
 		}
 	}
 

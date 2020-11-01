@@ -45,6 +45,46 @@ public:
 		return this->elements;
 	}
 
+	K get_key(size_t index)
+	{
+		Node<K, V>* tmp = this->head;
+
+		while (tmp)
+		{
+			if (index == 0)
+			{
+				return tmp->key;
+			}
+
+			if (!tmp->next)
+			{
+				throw invalid_argument("Given index is greater than list size.");
+			}
+			tmp = tmp->next;
+			index--;
+		}
+	}
+
+	V get_value(size_t index)
+	{
+		Node<K, V>* tmp = this->head;
+
+		while (tmp)
+		{
+			if (index == 0)
+			{
+				return tmp->value;
+			}
+
+			if (!tmp->next)
+			{
+				throw invalid_argument("Given index is greater than list size.");
+			}
+			tmp = tmp->next;
+			index--;
+		}
+	}
+
 	K get_head_key() const
 	{
 		if (head)

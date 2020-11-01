@@ -9,7 +9,7 @@ using namespace std;
 template <typename K, typename V>
 void do_commands(istream& input, size_t commands_number)
 {
-	HashMap<K, V> dict;
+	HashMap<K, V> map;
 	K key;
 	V value;
 	char command;
@@ -22,28 +22,28 @@ void do_commands(istream& input, size_t commands_number)
 		{
 		case 'R':
 			input >> key;
-			dict.remove(key);
+			map.remove(key);
 			break;
 		case 'A':
 			input >> key;
 			input >> value;
-			dict.add(key, value);
+			map.add(key, value);
 			break;
 		default:
 			break;
 		}
 	}
 
-	typename HashMap<K, V>::Iterator b = dict.end();
-
-	for (typename HashMap<K, V>::Iterator iter = dict.begin(); iter != dict.end(); iter++)
+	for (typename HashMap<K, V>::Iterator iter = map.begin(); iter != map.end(); iter++)
 	{
 		cout << iter.get_key() << " " << iter.get_value() << endl;
 	}
 
-	cout << b.get_key() << " " << b.get_value() << endl;
+	typename HashMap<K, V>::Iterator e = map.end();
 
-	cout << dict.size() << " " << dict.unique_elements() << endl;
+	cout << e.get_key() << " " << e.get_value() << endl;
+
+	cout << map.size() << " " << map.unique_elements() << endl;
 }
 
 int main()
