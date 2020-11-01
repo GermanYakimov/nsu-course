@@ -85,29 +85,6 @@ public:
 		}
 	}
 
-	K get_head_key() const
-	{
-		if (head)
-		{
-			return head->key;
-		}
-		throw "list is empty";
-	}
-
-	K get_tail_key() const
-	{
-		Node<K, V>* tmp = this->head;
-
-		while (tmp)
-		{
-			if (!tmp->next)
-			{
-				return tmp->key;
-			}
-			tmp = tmp->next;
-		}
-	}
-
 	V get(K key) const
 	{
 		Node<K, V>* tmp = this->head;
@@ -117,29 +94,6 @@ public:
 			if (tmp->key == key)
 			{
 				return tmp->value;
-			}
-			tmp = tmp->next;
-		}
-
-		throw invalid_argument("Node with given key doesn't exist.");
-	}
-
-	K get_next_key(K key)
-	{
-		Node<K, V>* tmp = this->head;
-
-		while (tmp)
-		{
-			if (tmp->key == key)
-			{
-				if (tmp->next)
-				{
-					return tmp->next->key;
-				}
-				else
-				{
-					throw exception("next doesn't exist"); // change it to exception here
-				}
 			}
 			tmp = tmp->next;
 		}

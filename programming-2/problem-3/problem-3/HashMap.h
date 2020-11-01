@@ -45,20 +45,18 @@ public:
 
 		friend const Iterator& operator++(Iterator& it, int)
 		{
-			Iterator it_copy = it;
-
 			if (it.list_index < (*(it.iter))->size() - 1)
 			{
 				it = Iterator(it.list_index + 1, it.iter, it.end);
-				return it_copy;
+				return it;
 			}
 
 			for (typename vector<List<K, V>*>::iterator i = it.iter + 1; i != it.end; i++)
 			{
-				if ((*i) && ((*i)->size() > 0))
+				if (*i)
 				{
 					it = Iterator(0, i, it.end);
-					return it_copy;
+					return it;
 				}
 			}
 		}
