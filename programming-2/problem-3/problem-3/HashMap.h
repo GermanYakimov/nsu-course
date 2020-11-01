@@ -43,30 +43,57 @@ public:
 	public:
 		Iterator(size_t idx, typename vector<List<K, V>*>::iterator i, typename vector<List<K, V>*>::iterator e) : list_index(idx), iter(i), end(e) {}
 
-		friend const Iterator& operator++(Iterator& it, int)
+		Iterator operator++(int)
 		{
-			if (it.list_index ==  -1)
+			Iterator this_copy = *this;
+			if (this->list_index == -1)
 			{
 				throw out_of_range("Can't increment map iterator past the end.");
 			}
 
-			if (it.list_index < (*(it.iter))->size() - 1)
+			if (this->list_index < (int)(*(this->iter))->size() - 1)
 			{
-				it = Iterator(it.list_index + 1, it.iter, it.end);
-				return it;
+				*this = Iterator(this->list_index + 1, this->iter, this->end);
+				return this_copy;
 			}
 
-			for (typename vector<List<K, V>*>::iterator i = it.iter + 1; i != it.end; i++)
+			for (typename vector<List<K, V>*>::iterator i = this->iter + 1; i != this->end; i++)
 			{
 				if (*i)
 				{
-					it = Iterator(0, i, it.end);
-					return it;
+					*this = Iterator(0, i, this->end);
+					return this_copy;
 				}
 			}
 
-			it = Iterator(-1, it.end, it.end);
-			return it;
+			*this = Iterator(-1, this->end, this->end);
+			return this_copy;
+		}
+
+		Iterator& operator++()
+		{
+			if (this->list_index == -1)
+			{
+				throw out_of_range("Can't increment map iterator past the end.");
+			}
+
+			if (this->list_index < (int)(*(this->iter))->size() - 1)
+			{
+				*this = Iterator(this->list_index + 1, this->iter, this->end);
+				return *this;
+			}
+
+			for (typename vector<List<K, V>*>::iterator i = this->iter + 1; i != this->end; i++)
+			{
+				if (*i)
+				{
+					*this = Iterator(0, i, this->end);
+					return *this;
+				}
+			}
+
+			*this = Iterator(-1, this->end, this->end);
+			return *this;
 		}
 
 		friend bool operator==(const Iterator& one, const Iterator& two)
@@ -79,7 +106,7 @@ public:
 			return one.iter != two.iter || one.list_index != two.list_index;
 		}
 
-		K key()
+		K key() const
 		{
 			if (*(this->iter))
 			{
@@ -88,13 +115,18 @@ public:
 			throw out_of_range("Can't dereference iterator over an empty collection.");
 		}
 
-		V value()
+		V value() const
 		{
 			if (this->list_index != -1 && *(this->iter))
 			{
 				return (*(this->iter))->get_value(this->list_index);
 			}
 			throw out_of_range("Can't dereference iterator over an empty collection.");
+		}
+
+		Iterator operator*()
+		{
+			return *this;
 		}
 	};
 

@@ -34,14 +34,14 @@ void do_commands(istream& input, size_t commands_number)
 		}
 	}
 
-	for (typename HashMap<K, V>::Iterator iter = map.begin(); iter != map.end(); iter++)
+	for (const auto &element : map)
 	{
-		cout << iter.key() << " " << iter.value() << endl;
+		cout << element.key() << " " << element.value() << endl;
 	}
 
-	typename HashMap<K, V>::Iterator e = map.end();
+	//typename HashMap<K, V>::Iterator e = map.end();
 
-	cout << e.key() << " " << e.value() << endl;
+	//cout << e.key() << " " << e.value() << endl;
 
 	cout << map.size() << " " << map.unique_elements() << endl;
 }
@@ -110,33 +110,6 @@ int main()
 	}
 
 	input.close();
-
-
-	//HashMap<string, int> map;
-
-	//map.add("Ivanov", 1);
-	//map.add("Petrova", 2);
-	//map.add("Ivanov", 3);
-	//map.add("Sidorov", 4);
-	//map.add("Smith", 5);
-
-	//HashMap<string, int>::Iterator iter = map.begin();
-
-	//cout << iter.key() << iter.value() << endl;
-
-	//for (HashMap<string, int>::Iterator iter = map.begin(); iter != map.end(); iter++)
-	//{
-	//	cout << iter.key() << iter.value() << endl;
-	//}
-	//vector<int> v = { 1, 2 };
-
-	//cout << *(v.end()) << endl;
-
-	//for (vector<int>::iterator iter = v.begin(); iter != v.end(); iter++)
-	//{
-	//	cout << *iter << endl;
-	//}
-
 
 	return EXIT_SUCCESS;
 }
