@@ -24,12 +24,25 @@ class HashMap
 
 	bool need_to_rehash() const
 	{
-		return this->size() / this->data.size() > this->load_factor;
+		return (this->size() / this->data.size()) > this->load_factor;
 	}
 
 	void rehash()
 	{
+		size_t current_size = this->size();
+		vector<pair<K, V>> tmp(current_size);
+
+		for (const auto& element : map)
+		{
+			tmp.push_back(make_pair(element.key(), element.value()));
+		}
+		this->data.clear();
 		this->data.resize(this->data.size() + portion);
+
+		for (size_t i = 0; i < current_size; i++)
+		{
+			this->add(tmp[i].first, tmp[i].second);
+		}
 	}
 
 public:
@@ -267,7 +280,7 @@ public:
 		}
 	}
 
-	~HashMap()
+	void clear()
 	{
 		for (size_t i = 0; i < this->data.size(); i++)
 		{
@@ -275,6 +288,12 @@ public:
 			{
 				delete this->data[i];
 			}
+			this->data[i] = nullptr;
 		}
+	}
+
+	~HashMap()
+	{
+		this->clear();
 	}
 };

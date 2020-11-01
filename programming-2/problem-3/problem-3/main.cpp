@@ -53,7 +53,6 @@ int main()
 	size_t commands_number;
 	input >> k_type >> v_type;
 	input >> commands_number;
-	//cout << k_type << " " << v_type;
 
 	switch (k_type)
 	{
