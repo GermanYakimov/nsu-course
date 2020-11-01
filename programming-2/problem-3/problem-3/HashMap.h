@@ -36,7 +36,7 @@ public:
 
 	class Iterator
 	{
-		size_t list_index;
+		int list_index;
 		typename vector<List<K, V>*>::iterator iter;
 		typename vector<List<K, V>*>::iterator end;
 
@@ -45,6 +45,11 @@ public:
 
 		friend const Iterator& operator++(Iterator& it, int)
 		{
+			if (it.list_index ==  -1)
+			{
+				throw out_of_range("Can't increment map iterator past the end.");
+			}
+
 			if (it.list_index < (*(it.iter))->size() - 1)
 			{
 				it = Iterator(it.list_index + 1, it.iter, it.end);
@@ -59,6 +64,9 @@ public:
 					return it;
 				}
 			}
+
+			it = Iterator(-1, it.end, it.end);
+			return it;
 		}
 
 		friend bool operator==(const Iterator& one, const Iterator& two)
@@ -71,14 +79,22 @@ public:
 			return one.iter != two.iter || one.list_index != two.list_index;
 		}
 
-		K get_key()
+		K key()
 		{
-			return (*(this->iter))->get_key(this->list_index);
+			if (*(this->iter))
+			{
+				return (*(this->iter))->get_key(this->list_index);
+			}
+			throw out_of_range("Can't dereference iterator over an empty collection.");
 		}
 
-		V get_value()
+		V value()
 		{
-			return (*(this->iter))->get_value(this->list_index);
+			if (this->list_index != -1 && *(this->iter))
+			{
+				return (*(this->iter))->get_value(this->list_index);
+			}
+			throw out_of_range("Can't dereference iterator over an empty collection.");
 		}
 	};
 
@@ -113,7 +129,7 @@ public:
 			return Iterator(0, this->data.begin(), this->data.begin());
 		}
 
-		return Iterator(this->data[index]->size() - 1, this->data.begin() + index, this->data.end());
+		return Iterator(-1, this->data.end(), this->data.end());
 	}
 
 	HashMap() : load_factor(0.7)

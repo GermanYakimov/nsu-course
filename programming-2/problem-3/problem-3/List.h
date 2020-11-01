@@ -56,13 +56,11 @@ public:
 				return tmp->key;
 			}
 
-			if (!tmp->next)
-			{
-				throw invalid_argument("Given index is greater than list size.");
-			}
 			tmp = tmp->next;
 			index--;
 		}
+
+		throw out_of_range("Given index is greater than list size.");
 	}
 
 	V get_value(size_t index)
@@ -76,13 +74,11 @@ public:
 				return tmp->value;
 			}
 
-			if (!tmp->next)
-			{
-				throw invalid_argument("Given index is greater than list size.");
-			}
 			tmp = tmp->next;
 			index--;
 		}
+
+		throw out_of_range("Given index is greater than list size.");
 	}
 
 	V get(K key) const
