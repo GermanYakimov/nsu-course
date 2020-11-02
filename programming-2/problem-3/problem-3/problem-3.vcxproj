@@ -140,10 +140,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Matrix.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HashMap.h" />
     <ClInclude Include="List.h" />
+    <ClInclude Include="Matrix.h" />
+    <ClInclude Include="MultiHashMap.h" />
     <ClInclude Include="Node.h" />
   </ItemGroup>
   <ItemGroup>
