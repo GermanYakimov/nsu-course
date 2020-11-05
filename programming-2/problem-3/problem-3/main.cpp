@@ -3,6 +3,7 @@
 #include <set>
 #include <fstream>
 
+#include "HashMap.h"
 #include "MultiHashMap.h"
 using namespace std;
 
