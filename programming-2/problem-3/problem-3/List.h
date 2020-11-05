@@ -29,12 +29,6 @@ class List
 		return nullptr;
 	}
 
-	void append(K key, V value)
-	{
-		Node<K, V>* new_element = new Node<K, V>(key, value, this->head);
-		this->head = new_element;
-	}
-
 public:
 	List() : head(nullptr), elements(0) {}
 
@@ -111,7 +105,13 @@ public:
 		return result;
 	}
 
-	void rewrite_or_add(K key, V value)
+	void append(K key, V value)
+	{
+		Node<K, V>* new_element = new Node<K, V>(key, value, this->head);
+		this->head = new_element;
+	}
+
+	void rewrite(K key, V value)
 	{
 		Node<K, V>* element = this->get_pointer(key);
 

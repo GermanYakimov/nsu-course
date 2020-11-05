@@ -276,7 +276,7 @@ public:
 		}
 		else
 		{
-			this->data[index]->rewrite_or_add(key, value);
+			this->data[index]->rewrite(key, value);
 		}
 	}
 
