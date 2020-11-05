@@ -50,4 +50,34 @@ public:
 		}
 	}
 
+	size_t slice_size(K key)
+	{
+		size_t result = 0;
+
+		for (auto element : *this)
+		{
+			if (element.key() == key)
+			{
+				result++;
+			}
+		}
+
+		return result;
+	}
+
+	vector<V> slice(K key)
+	{
+		vector<V> result;
+
+		for (auto element : *this)
+		{
+			if (element.key() == key)
+			{
+				result.push_back(element.value());
+			}
+		}
+
+		return result;
+	}
+
 };

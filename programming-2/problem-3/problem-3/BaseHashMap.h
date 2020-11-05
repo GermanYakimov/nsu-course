@@ -17,6 +17,9 @@ protected:
 	static const size_t portion = 5;
 	double load_factor;
 
+	size_t array_size;
+	size_t map_size;
+
 	size_t get_index(K key) const
 	{
 		return this->hasher(key) % this->data.size();
@@ -47,13 +50,13 @@ protected:
 
 public:
 
-	BaseHashMap() : load_factor(0.7)
+	BaseHashMap() : load_factor(0.7), array_size(default_size), map_size(0)
 	{
 		data.resize(default_size);
 		fill(data.begin(), data.end(), nullptr);
 	}
 
-	BaseHashMap(double lfactor)
+	BaseHashMap(double lfactor) : array_size(default_size), map_size(0)
 	{
 		if (0 < lfactor <= 1)
 		{

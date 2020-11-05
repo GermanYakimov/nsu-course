@@ -23,6 +23,7 @@ public:
 		if (this->data[index])
 		{
 			this->data[index]->remove(key);
+			this->map_size--;
 
 			if (!this->data[index]->size())
 			{

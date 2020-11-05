@@ -35,12 +35,20 @@ void do_commands(istream& input, size_t commands_number)
 		}
 	}
 
-	cout << map.size() << endl;
-
 	for (const auto &element : map)
 	{
-		cout << element.key() << " " << element.value() << endl;
+		vector<V> values;
+		values = map.slice(element.key());
+
+		cout << element.key() << endl;
+
+		for (auto& value : values)
+		{
+			cout << value << endl;
+		}
 	}
+
+
 
 	//cout << map.size() << " " << map.unique_elements() << endl;
 }
