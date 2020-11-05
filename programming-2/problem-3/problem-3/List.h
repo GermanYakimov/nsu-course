@@ -159,8 +159,6 @@ public:
 			prev = current;
 			current = current->next;
 		}
-
-		//throw invalid_argument("Node with given key doesn't exist.");
 	}
 
 	~List()

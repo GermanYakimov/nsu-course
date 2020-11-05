@@ -9,7 +9,6 @@ using namespace std;
 template <typename K, typename V>
 class MultiHashMap: public BaseHashMap<K, V>
 {
-
 public:
 
 	MultiHashMap() : BaseHashMap<K, V>() {}

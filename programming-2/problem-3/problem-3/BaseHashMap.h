@@ -13,8 +13,8 @@ protected:
 	vector<List<K, V>*> data;
 	hash<K> hasher;
 
-	static const size_t default_size = 10000;
-	static const size_t portion = 5000;
+	static const size_t default_size = 10;
+	static const size_t portion = 5;
 	double load_factor;
 
 	size_t get_index(K key) const
@@ -30,13 +30,13 @@ protected:
 	void rehash()
 	{
 		size_t current_size = this->size();
-		vector<pair<K, V>> tmp(current_size);
+		vector<pair<K, V>> tmp;
 
 		for (const auto& element : *this)
 		{
 			tmp.push_back(make_pair(element.key(), element.value()));
 		}
-		this->data.clear();
+		this->clear();
 		this->data.resize(this->data.size() + portion);
 
 		for (size_t i = 0; i < current_size; i++)
@@ -46,6 +46,27 @@ protected:
 	}
 
 public:
+
+	BaseHashMap() : load_factor(0.7)
+	{
+		data.resize(default_size);
+		fill(data.begin(), data.end(), nullptr);
+	}
+
+	BaseHashMap(double lfactor)
+	{
+		if (0 < lfactor <= 1)
+		{
+			this->load_factor = lfactor;
+		}
+		else
+		{
+			throw invalid_argument("Invalid load factor");
+		}
+
+		data.resize(default_size);
+		fill(data.begin(), data.end(), nullptr);
+	}
 
 	class Iterator
 	{
@@ -143,7 +164,6 @@ public:
 		}
 	};
 
-
 	Iterator begin()
 	{
 		for (size_t i = 0; i < this->data.size(); i++)
@@ -175,27 +195,6 @@ public:
 		}
 
 		return Iterator(-1, this->data.end(), this->data.end());
-	}
-
-	BaseHashMap() : load_factor(0.7)
-	{
-		data.resize(default_size);
-		fill(data.begin(), data.end(), nullptr);
-	}
-
-	BaseHashMap(double lfactor)
-	{
-		if (0 < lfactor <= 1)
-		{
-			this->load_factor = lfactor;
-		}
-		else
-		{
-			throw invalid_argument("Invalid load factor");
-		}
-
-		data.resize(default_size);
-		fill(data.begin(), data.end(), nullptr);
 	}
 
 	size_t size() const
