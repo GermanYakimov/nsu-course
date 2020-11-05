@@ -100,9 +100,40 @@ public:
 		}
 	}
 
-	void remove(K key) {}
+	void remove(K key)
+	{
+		size_t index = this->get_index(key);
 
-	void add(K key, V value) {}
+		if (this->data[index])
+		{
+			this->data[index]->remove_all(key);
+
+			if (!this->data[index]->size())
+			{
+				delete this->data[index];
+				this->data[index] = nullptr;
+			}
+		}
+	}
+
+	void add(K key, V value)
+	{
+		size_t index = this->get_index(key);
+
+		if (!this->data[index])
+		{
+			this->data[index] = new List<K, V>(key, value);
+
+			if (this->need_to_rehash())
+			{
+				this->rehash();
+			}
+		}
+		else
+		{
+			this->data[index]->append(key, value);
+		}
+	}
 
 	void clear()
 	{

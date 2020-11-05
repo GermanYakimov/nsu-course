@@ -126,6 +126,14 @@ public:
 		}
 	}
 
+	void remove_all(K key)
+	{
+		while (this->get_pointer(key))
+		{
+			this->remove(key);
+		}
+	}
+
 	void remove(K key)
 	{
 		Node<K, V>* current = this->head;

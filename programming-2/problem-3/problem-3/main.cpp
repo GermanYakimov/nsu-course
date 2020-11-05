@@ -3,7 +3,7 @@
 #include <set>
 #include <fstream>
 
-#include "HashMap.h"
+#include "MultiHashMap.h"
 using namespace std;
 
 template <typename K, typename V>
@@ -34,16 +34,16 @@ void do_commands(istream& input, size_t commands_number)
 		}
 	}
 
-	for (const auto &element : map)
-	{
-		cout << element.key() << " " << element.value() << endl;
-	}
+	//for (const auto &element : map)
+	//{
+	//	cout << element.key() << " " << element.value() << endl;
+	//}
 
 	//typename HashMap<K, V>::Iterator e = map.end();
 
 	//cout << e.key() << " " << e.value() << endl;
 
-	cout << map.size() << " " << map.unique_elements() << endl;
+	//cout << map.size() << " " << map.unique_elements() << endl;
 }
 
 int main()
