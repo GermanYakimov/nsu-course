@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "Node.h"
-#include "HashMap.h"
 
 using namespace std;
 
@@ -109,6 +108,7 @@ public:
 	{
 		Node<K, V>* new_element = new Node<K, V>(key, value, this->head);
 		this->head = new_element;
+		this->elements++;
 	}
 
 	void rewrite(K key, V value)
@@ -118,7 +118,6 @@ public:
 		if (!element)
 		{
 			this->append(key, value);
-			this->elements++;
 		}
 		else
 		{

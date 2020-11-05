@@ -32,7 +32,7 @@ class HashMap
 		size_t current_size = this->size();
 		vector<pair<K, V>> tmp(current_size);
 
-		for (const auto& element : map)
+		for (const auto& element : *this)
 		{
 			tmp.push_back(make_pair(element.key(), element.value()));
 		}

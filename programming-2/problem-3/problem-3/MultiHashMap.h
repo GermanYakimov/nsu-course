@@ -27,24 +27,118 @@ class MultiHashMap
 
 	void rehash()
 	{
-		//size_t current_size = this->size();
-		//vector<pair<K, V>> tmp(current_size);
+		size_t current_size = this->size();
+		vector<pair<K, V>> tmp(current_size);
 
-		//for (const auto& element : map)
-		//{
-		//	tmp.push_back(make_pair(element.key(), element.value()));
-		//}
-		//this->data.clear();
-		//this->data.resize(this->data.size() + portion);
+		for (const auto& element : *this)
+		{
+			tmp.push_back(make_pair(element.key(), element.value()));
+		}
+		this->data.clear();
+		this->data.resize(this->data.size() + portion);
 
-		//for (size_t i = 0; i < current_size; i++)
-		//{
-		//	this->add(tmp[i].first, tmp[i].second);
-		//}
+		for (size_t i = 0; i < current_size; i++)
+		{
+			this->add(tmp[i].first, tmp[i].second);
+		}
 	}
 
 public:
-	class Iterator;
+	class Iterator
+	{
+		int list_index;
+		typename vector<List<K, V>*>::iterator iter;
+		typename vector<List<K, V>*>::iterator end;
+
+	public:
+		Iterator(size_t idx, typename vector<List<K, V>*>::iterator i, typename vector<List<K, V>*>::iterator e) : list_index(idx), iter(i), end(e) {}
+
+		Iterator operator++(int)
+		{
+			Iterator this_copy = *this;
+			if (this->list_index == -1)
+			{
+				throw out_of_range("Can't increment map iterator past the end.");
+			}
+
+			if (this->list_index < (int)(*(this->iter))->size() - 1)
+			{
+				*this = Iterator(this->list_index + 1, this->iter, this->end);
+				return this_copy;
+			}
+
+			for (typename vector<List<K, V>*>::iterator i = this->iter + 1; i != this->end; i++)
+			{
+				if (*i)
+				{
+					*this = Iterator(0, i, this->end);
+					return this_copy;
+				}
+			}
+
+			*this = Iterator(-1, this->end, this->end);
+			return this_copy;
+		}
+
+		Iterator& operator++()
+		{
+			if (this->list_index == -1)
+			{
+				throw out_of_range("Can't increment map iterator past the end.");
+			}
+
+			if (this->list_index < (int)(*(this->iter))->size() - 1)
+			{
+				*this = Iterator(this->list_index + 1, this->iter, this->end);
+				return *this;
+			}
+
+			for (typename vector<List<K, V>*>::iterator i = this->iter + 1; i != this->end; i++)
+			{
+				if (*i)
+				{
+					*this = Iterator(0, i, this->end);
+					return *this;
+				}
+			}
+
+			*this = Iterator(-1, this->end, this->end);
+			return *this;
+		}
+
+		friend bool operator==(const Iterator& one, const Iterator& two)
+		{
+			return one.iter == two.iter && one.list_index == two.list_index;
+		}
+
+		friend bool operator!=(const Iterator& one, const Iterator& two)
+		{
+			return one.iter != two.iter || one.list_index != two.list_index;
+		}
+
+		K key() const
+		{
+			if (*(this->iter))
+			{
+				return (*(this->iter))->get_key(this->list_index);
+			}
+			throw out_of_range("Can't dereference iterator over an empty collection.");
+		}
+
+		V value() const
+		{
+			if (this->list_index != -1 && *(this->iter))
+			{
+				return (*(this->iter))->get_value(this->list_index);
+			}
+			throw out_of_range("Can't dereference iterator over an empty collection.");
+		}
+
+		Iterator operator*()
+		{
+			return *this;
+		}
+	};
 
 	MultiHashMap() : load_factor(0.7)
 	{
@@ -67,9 +161,38 @@ public:
 		fill(data.begin(), data.end(), nullptr);
 	}
 
-	Iterator begin() {}
+	Iterator begin()
+	{
+		for (size_t i = 0; i < this->data.size(); i++)
+		{
+			if (this->data[i] && this->data[i]->size() > 0)
+			{
+				return Iterator(0, this->data.begin() + i, this->data.end());
+			}
+		}
 
-	Iterator end() {}
+		return Iterator(0, this->data.begin(), this->data.begin());
+	}
+
+	Iterator end()
+	{
+		size_t index = 0;
+
+		for (size_t i = 1; i < this->data.size(); i++)
+		{
+			if (this->data[i] && (this->data[i]->size() > 0))
+			{
+				index = i;
+			}
+		}
+
+		if (!index && !this->data[0])
+		{
+			return Iterator(0, this->data.begin(), this->data.begin());
+		}
+
+		return Iterator(-1, this->data.end(), this->data.end());
+	}
 
 	size_t size() const
 	{
