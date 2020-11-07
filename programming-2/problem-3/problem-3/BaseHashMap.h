@@ -25,7 +25,7 @@ protected:
 		return this->hasher(key) % this->data.size();
 	}
 
-	bool need_to_rehash() const
+	bool time_to_rehash() const
 	{
 		return (this->map_size / this->data.size()) > this->load_factor;
 	}
@@ -74,28 +74,29 @@ public:
 
 	class Iterator
 	{
-		int list_index;
-		typename vector<List<K, V>*>::iterator iter;
+		int list_index; // element index in list
+		typename vector<List<K, V>*>::iterator current_position;
 		typename vector<List<K, V>*>::iterator end;
 
 	public:
-		Iterator(size_t idx, typename vector<List<K, V>*>::iterator i, typename vector<List<K, V>*>::iterator e) : list_index(idx), iter(i), end(e) {}
+		Iterator(size_t idx, typename vector<List<K, V>*>::iterator i, typename vector<List<K, V>*>::iterator e) : list_index(idx), current_position(i), end(e) {}
 
 		Iterator operator++(int)
 		{
-			Iterator this_copy = *this;
 			if (this->list_index == -1)
 			{
 				throw out_of_range("Can't increment map iterator past the end.");
 			}
 
-			if (this->list_index < (int)(*(this->iter))->size() - 1)
+			Iterator this_copy = *this;
+
+			if (this->list_index < (int)(*(this->current_position))->size() - 1)
 			{
-				*this = Iterator(this->list_index + 1, this->iter, this->end);
+				*this = Iterator(this->list_index + 1, this->current_position, this->end);
 				return this_copy;
 			}
 
-			for (typename vector<List<K, V>*>::iterator i = this->iter + 1; i != this->end; i++)
+			for (typename vector<List<K, V>*>::iterator i = this->current_position + 1; i != this->end; i++)
 			{
 				if (*i)
 				{
@@ -104,60 +105,40 @@ public:
 				}
 			}
 
-			*this = Iterator(-1, this->end, this->end);
+			*this = Iterator(-1, this->end, this->end); // this is the end
 			return this_copy;
 		}
 
 		Iterator& operator++()
 		{
-			if (this->list_index == -1)
-			{
-				throw out_of_range("Can't increment map iterator past the end.");
-			}
-
-			if (this->list_index < (int)(*(this->iter))->size() - 1)
-			{
-				*this = Iterator(this->list_index + 1, this->iter, this->end);
-				return *this;
-			}
-
-			for (typename vector<List<K, V>*>::iterator i = this->iter + 1; i != this->end; i++)
-			{
-				if (*i)
-				{
-					*this = Iterator(0, i, this->end);
-					return *this;
-				}
-			}
-
-			*this = Iterator(-1, this->end, this->end);
+			*this++;
 			return *this;
 		}
 
 		friend bool operator==(const Iterator& one, const Iterator& two)
 		{
-			return one.iter == two.iter && one.list_index == two.list_index;
+			return (one.current_position == two.current_position) && (one.list_index == two.list_index);
 		}
 
 		friend bool operator!=(const Iterator& one, const Iterator& two)
 		{
-			return one.iter != two.iter || one.list_index != two.list_index;
+			return !(one == two);
 		}
 
 		K key() const
 		{
-			if (*(this->iter))
+			if (this->list_index != -1 && *(this->current_position))
 			{
-				return (*(this->iter))->get_key(this->list_index);
+				return (*(this->current_position))->get_key(this->list_index);
 			}
 			throw out_of_range("Can't dereference iterator over an empty collection.");
 		}
 
 		V value() const
 		{
-			if (this->list_index != -1 && *(this->iter))
+			if (this->list_index != -1 && *(this->current_position))
 			{
-				return (*(this->iter))->get_value(this->list_index);
+				return (*(this->current_position))->get_value(this->list_index);
 			}
 			throw out_of_range("Can't dereference iterator over an empty collection.");
 		}
@@ -170,35 +151,32 @@ public:
 
 	Iterator begin()
 	{
+		// find first non-empty list
 		for (size_t i = 0; i < this->data.size(); i++)
 		{
-			if (this->data[i] && this->data[i]->size() > 0)
+			if (this->data[i])
 			{
 				return Iterator(0, this->data.begin() + i, this->data.end());
 			}
 		}
 
+		// collection is empty
 		return Iterator(0, this->data.begin(), this->data.begin());
 	}
 
 	Iterator end()
 	{
-		size_t index = 0;
-
-		for (size_t i = 1; i < this->data.size(); i++)
+		// check that the collection has at least one element
+		for (size_t i = 0; i < this->data.size(); i++)
 		{
-			if (this->data[i] && (this->data[i]->size() > 0))
+			if (this->data[i])
 			{
-				index = i;
+				return Iterator(-1, this->data.end(), this->data.end());
 			}
 		}
 
-		if (!index && !this->data[0])
-		{
-			return Iterator(0, this->data.begin(), this->data.begin());
-		}
-
-		return Iterator(-1, this->data.end(), this->data.end());
+		// collection is empty
+		return Iterator(0, this->data.begin(), this->data.begin());
 	}
 
 	size_t size() const

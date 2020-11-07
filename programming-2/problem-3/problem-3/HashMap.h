@@ -60,7 +60,7 @@ public:
 			this->data[index] = new List<K, V>(key, value);
 			this->map_size++;
 
-			if (this->need_to_rehash())
+			if (this->time_to_rehash())
 			{
 				this->rehash();
 			}
