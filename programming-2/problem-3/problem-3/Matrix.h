@@ -99,9 +99,31 @@ public:
 
 	void print(ofstream& out) const;
 
+	string row_to_string(const size_t row_index) const;
+
 	~Matrix();
 
 };
 
 
 Matrix operator*(double constant, const Matrix& A);
+
+
+namespace std
+{
+	template<> class hash<Matrix>
+	{
+	public:
+		size_t operator()(Matrix const& M) const
+		{
+			string string_to_hash = "";
+
+			for (size_t i = 0; i < M.dim(); i++)
+			{
+				string_to_hash += M.row_to_string(i);
+			}
+
+			return hash<string>{}(string_to_hash);
+		}
+	};
+}

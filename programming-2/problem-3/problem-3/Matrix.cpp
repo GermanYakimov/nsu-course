@@ -5,6 +5,7 @@
 #include <vector>
 #include <functional>
 #include <stdexcept>
+#include <string>
 
 #include "matrix.h"
 
@@ -330,6 +331,23 @@ void Matrix::print(ofstream& out) const
 		}
 		out << endl;
 	}
+}
+
+string Matrix::row_to_string(const size_t row_index) const
+{
+	if (row_index >= this->dimension)
+	{
+		throw invalid_argument("Row index is greater than dimension.");
+	}
+
+	string result = "";
+
+	for (size_t i = 0; i < this->dimension; i++)
+	{
+		result += to_string(this->content[row_index][i]);
+	}
+
+	return result;
 }
 
 ostream& operator<<(ostream& out, Matrix matrix)
