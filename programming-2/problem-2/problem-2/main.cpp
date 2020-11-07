@@ -4,7 +4,6 @@
 using namespace std;
 
 #include "expressions.h"
-#include "expression_builder.h"
 
 int main()
 {
@@ -21,6 +20,9 @@ int main()
 	ofstream output("output.txt");
 	d->print(output);
 	output.close();
+
+	delete exp;
+	delete d;
 
 	return EXIT_SUCCESS;
 }
