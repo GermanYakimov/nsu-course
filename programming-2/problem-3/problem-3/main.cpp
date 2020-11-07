@@ -6,6 +6,7 @@
 #include "HashMap.h"
 #include "MultiHashMap.h"
 #include "Matrix.h"
+
 using namespace std;
 
 template <typename K, typename V>
@@ -48,8 +49,6 @@ void do_commands(istream& input, size_t commands_number)
 			cout << value << endl;
 		}
 	}
-
-
 
 	//cout << map.size() << " " << map.unique_elements() << endl;
 }

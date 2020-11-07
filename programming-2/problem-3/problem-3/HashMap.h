@@ -1,4 +1,5 @@
 #pragma once
+
 #include <vector>
 #include <iostream>
 #include <iterator>
@@ -22,10 +23,9 @@ public:
 
 		if (this->data[index])
 		{
-			this->data[index]->remove(key);
-			this->map_size--;
+			this->map_size -= this->data[index]->remove(key);
 
-			if (!this->data[index]->size())
+			if (this->data[index]->empty())
 			{
 				delete this->data[index];
 				this->data[index] = nullptr;
@@ -58,6 +58,7 @@ public:
 		if (!this->data[index])
 		{
 			this->data[index] = new List<K, V>(key, value);
+			this->map_size++;
 
 			if (this->need_to_rehash())
 			{
@@ -66,7 +67,7 @@ public:
 		}
 		else
 		{
-			this->data[index]->rewrite(key, value);
+			this->map_size += this->data[index]->rewrite(key, value);
 		}
 	}
 };

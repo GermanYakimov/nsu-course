@@ -111,29 +111,56 @@ public:
 		this->elements++;
 	}
 
-	void rewrite(K key, V value)
+	size_t rewrite(K key, V value)
 	{
 		Node<K, V>* element = this->get_pointer(key);
 
 		if (!element)
 		{
 			this->append(key, value);
+			return 0;
 		}
 		else
 		{
 			element->value = value;
+			return 1;
 		}
 	}
 
-	void remove_all(K key)
+	size_t remove_all(K key)
 	{
+		size_t deleted_elements = 0;
+
 		while (this->get_pointer(key))
 		{
-			this->remove(key);
+			deleted_elements += this->remove(key);
 		}
+
+		return deleted_elements;
 	}
 
-	void remove(K key)
+	bool exists(K key, V value) const
+	{
+		Node<K, V>* tmp = this->head;
+
+		while (tmp)
+		{
+			if (key == tmp->key && value == tmp->value)
+			{
+				return true;
+			}
+			tmp = tmp->next;
+		}
+
+		return false;
+	}
+
+	bool empty() const
+	{
+		return this->head == nullptr;
+	}
+
+	size_t remove(K key)
 	{
 		Node<K, V>* current = this->head;
 		Node<K, V>* prev = nullptr;
@@ -153,17 +180,19 @@ public:
 
 				this->elements--;
 				delete current;
-				return;
+				return 1;
 			}
 
 			prev = current;
 			current = current->next;
 		}
+
+		return 0;
 	}
 
 	~List()
 	{
-		Node<K, V>* prev;
+		Node<K, V>* prev = nullptr;
 		Node<K, V>* current = this->head;
 
 		while (current)

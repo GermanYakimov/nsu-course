@@ -1,4 +1,5 @@
 #pragma once
+
 #include<vector>
 #include <iostream>
 
@@ -13,11 +14,10 @@ protected:
 	vector<List<K, V>*> data;
 	hash<K> hasher;
 
-	static const size_t default_size = 10;
-	static const size_t portion = 5;
-	double load_factor;
+	static const size_t default_size = 10000;
+	static const size_t portion = 5000;
 
-	size_t array_size;
+	double load_factor;
 	size_t map_size;
 
 	size_t get_index(K key) const
@@ -27,12 +27,12 @@ protected:
 
 	bool need_to_rehash() const
 	{
-		return (this->size() / this->data.size()) > this->load_factor;
+		return (this->map_size / this->data.size()) > this->load_factor;
 	}
 
 	void rehash()
 	{
-		size_t current_size = this->size();
+		size_t current_size = this->map_size;
 		vector<pair<K, V>> tmp;
 
 		for (const auto& element : *this)
@@ -46,6 +46,7 @@ protected:
 		{
 			this->add(tmp[i].first, tmp[i].second);
 		}
+		this->map_size = current_size;
 	}
 
 public:
@@ -64,7 +65,7 @@ public:
 		}
 		else
 		{
-			throw invalid_argument("Invalid load factor");
+			throw invalid_argument("Invalid load factor.");
 		}
 
 		data.resize(default_size);
@@ -202,17 +203,7 @@ public:
 
 	size_t size() const
 	{
-		size_t result = 0;
-
-		for (size_t i = 0; i < this->data.size(); i++)
-		{
-			if (this->data[i])
-			{
-				result += this->data[i]->size();
-			}
-		}
-
-		return result;
+		return this->map_size;
 	}
 
 	V get(K key) const
@@ -223,10 +214,8 @@ public:
 		{
 			throw invalid_argument("Element with given key doesn't exist.");
 		}
-		else
-		{
-			return this->data[index]->get(key);
-		}
+
+		return this->data[index]->get(key);
 	}
 
 	virtual void remove(K key) = 0;
@@ -240,9 +229,10 @@ public:
 			if (this->data[i])
 			{
 				delete this->data[i];
+				this->data[i] = nullptr;
 			}
-			this->data[i] = nullptr;
 		}
+		this->map_size = 0;
 	}
 
 	~BaseHashMap()

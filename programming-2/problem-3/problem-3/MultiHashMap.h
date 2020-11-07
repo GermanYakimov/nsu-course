@@ -21,9 +21,9 @@ public:
 
 		if (this->data[index])
 		{
-			this->data[index]->remove_all(key);
+			this->map_size -= this->data[index]->remove_all(key);
 
-			if (!this->data[index]->size())
+			if (this->data[index]->empty())
 			{
 				delete this->data[index];
 				this->data[index] = nullptr;
@@ -38,19 +38,21 @@ public:
 		if (!this->data[index])
 		{
 			this->data[index] = new List<K, V>(key, value);
+			this->map_size++;
 
 			if (this->need_to_rehash())
 			{
 				this->rehash();
 			}
 		}
-		else
+		else if (!this->data[index]->exists(key, value))
 		{
 			this->data[index]->append(key, value);
+			this->map_size++;
 		}
 	}
 
-	size_t slice_size(K key)
+	size_t slice_size(K key) const
 	{
 		size_t result = 0;
 
@@ -65,7 +67,7 @@ public:
 		return result;
 	}
 
-	vector<V> slice(K key)
+	vector<V> slice(K key) const
 	{
 		vector<V> result;
 
