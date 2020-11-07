@@ -12,7 +12,7 @@ using namespace std;
 template <typename K, typename V>
 void do_commands(istream& input, size_t commands_number)
 {
-	MultiHashMap<K, V> map;
+	HashMap<K, V> map;
 	K key;
 	V value;
 	char command;
@@ -37,39 +37,12 @@ void do_commands(istream& input, size_t commands_number)
 		}
 	}
 
-	for (const auto &element : map)
-	{
-		vector<V> values;
-		values = map.slice(element.key());
-
-		cout << element.key() << endl;
-
-		for (auto& value : values)
-		{
-			cout << value << endl;
-		}
-	}
-
-	//cout << map.size() << " " << map.unique_elements() << endl;
+	cout << map.size() << " " << map.unique_elements() << endl;
 }
 
 int main()
 {
-	Matrix A(3);
-	Matrix B(3);
-
-	B[2][2] = 0;
-
-	HashMap<Matrix, int> map;
-	map.add(A, 1);
-	map.add(B, 0);
-
-	for (const auto& item : map)
-	{
-		cout << item.key() << item.value() << endl;
-	}
-
-	/*ifstream input("input.txt");
+	ifstream input("input.txt");
 	char k_type, v_type;
 	size_t commands_number;
 	input >> k_type >> v_type;
@@ -129,7 +102,7 @@ int main()
 		throw invalid_argument("Incorrect key type.");
 	}
 
-	input.close();*/
+	input.close();
 
 	return EXIT_SUCCESS;
 }

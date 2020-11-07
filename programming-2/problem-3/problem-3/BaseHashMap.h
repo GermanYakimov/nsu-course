@@ -51,13 +51,13 @@ protected:
 
 public:
 
-	BaseHashMap() : load_factor(0.7), array_size(default_size), map_size(0)
+	BaseHashMap() : load_factor(0.7), map_size(0)
 	{
 		data.resize(default_size);
 		fill(data.begin(), data.end(), nullptr);
 	}
 
-	BaseHashMap(double lfactor) : array_size(default_size), map_size(0)
+	BaseHashMap(double lfactor) : map_size(0)
 	{
 		if (0 < lfactor <= 1)
 		{
@@ -111,7 +111,7 @@ public:
 
 		Iterator& operator++()
 		{
-			*this++;
+			(*this)++;
 			return *this;
 		}
 
