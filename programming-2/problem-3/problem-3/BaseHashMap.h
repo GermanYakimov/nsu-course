@@ -74,7 +74,7 @@ public:
 
 	class Iterator
 	{
-		int list_index; // element index in list
+		int list_index; // element index in the list
 		typename vector<List<K, V>*>::iterator current_position;
 		typename vector<List<K, V>*>::iterator end;
 
@@ -184,16 +184,18 @@ public:
 		return this->map_size;
 	}
 
-	V get(K key) const
+	Iterator get(K key)
 	{
 		size_t index = this->get_index(key);
 
 		if (!this->data[index])
 		{
-			throw invalid_argument("Element with given key doesn't exist.");
+			return this->end();
 		}
 
-		return this->data[index]->get(key);
+		size_t list_idx = this->data[index]->get_index_by_key(key);
+
+		return Iterator(list_idx, this->data.begin() + index, this->data.end());
 	}
 
 	virtual void remove(K key) = 0;

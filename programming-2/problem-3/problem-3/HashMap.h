@@ -59,15 +59,15 @@ public:
 		{
 			this->data[index] = new List<K, V>(key, value);
 			this->map_size++;
-
-			if (this->time_to_rehash())
-			{
-				this->rehash();
-			}
 		}
 		else
 		{
 			this->map_size += this->data[index]->rewrite(key, value);
+		}
+
+		if (this->time_to_rehash())
+		{
+			this->rehash();
 		}
 	}
 };

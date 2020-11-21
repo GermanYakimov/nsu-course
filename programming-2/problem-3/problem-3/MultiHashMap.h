@@ -40,16 +40,16 @@ public:
 		{
 			this->data[index] = new List<K, V>(key, value);
 			this->map_size++;
-
-			if (this->time_to_rehash())
-			{
-				this->rehash();
-			}
 		}
 		else if (!this->data[index]->exists(key, value))
 		{
 			this->data[index]->append(key, value);
 			this->map_size++;
+		}
+
+		if (this->time_to_rehash())
+		{
+			this->rehash();
 		}
 	}
 

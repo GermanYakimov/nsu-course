@@ -56,6 +56,25 @@ public:
 		throw out_of_range("Given index is greater than list size.");
 	}
 
+	size_t get_index_by_key(K key)
+	{
+		Node<K, V>* tmp = this->head;
+		size_t result = 0;
+
+		while (tmp)
+		{
+			if (tmp->key == key)
+			{
+				return result;
+			}
+
+			tmp = tmp->next;
+			result++;
+		}
+
+		throw invalid_argument("Element with given key doesn't exist.");
+	}
+
 	V get_value(size_t index)
 	{
 		Node<K, V>* tmp = this->head;
