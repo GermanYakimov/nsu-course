@@ -1,0 +1,36 @@
+Hardware: Intel(R) Core(TM) i5-6500 @ 3.20GHz, 16GB DDR4 RAM
+OS: Windows 10 Pro 2019, x64
+Compiler: VS 2019
+
+Benchmark results (seconds):
+
+1 worker: 36.0069
+2 workers: 21.0037
+3 workers: 15.0035
+4 workers: 12.0312
+5 workers: 12.0112
+6 workers: 12.0461
+7 workers: 15.0563
+8 workers: 15.1375
+9 workers: 15.1501
+10 workers: 15.1205
+11 workers: 15.1932
+12 workers: 15.1401
+13 workers: 15.1898
+14 workers: 15.3108
+15 workers: 15.2974
+20 workers: 15.4257
+25 workers: 15.4707
+26 workers: 15.6282
+27 workers: 15.4795
+28 workers: 15.5945
+29 workers: 18.7584
+30 workers: 18.8118
+35 workers: 19.0558
+40 workers: 19.0949
+45 workers: 19.2779
+50 workers: 19.7444
+75 workers: 23.0462
+100 workers: 25.0137
+200 workers: 32.5666
+500 workers: 38.229
