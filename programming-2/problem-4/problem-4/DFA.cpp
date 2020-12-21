@@ -472,7 +472,7 @@ DFA DFA::build_fa(string regexp)
 	{
 		regexp = regexp.substr(0, regexp.length() - 1);
 		regexp = regexp.substr(1, regexp.length() - 2);
-		
+
 		return DFA::kleene_star(DFA::build_fa(regexp));
 	}
 
