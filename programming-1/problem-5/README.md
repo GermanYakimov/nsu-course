@@ -1,6 +1,6 @@
-# Problem 1
-Theme: basic C concepts: data types, arrays and loops
+# Problem 5
+Theme: graphs and Dijkstra algorithm based on binary-heap
 
-Task: [task.pdf](./task.pdf)
+Task: -
 
-Solution: [source.c](./problem-1/source.c)
+Algorithm implementation: [heap.c](./problem-5/heap.c)
