@@ -1,6 +1,8 @@
-# Problem 1
-Theme: basic C concepts: data types, arrays and loops
+# Problem 5
+Theme: basic C++ concepts - multithreading (files crawler)
 
 Task: [task.pdf](./task.pdf)
 
-Solution: [source.c](./problem-1/source.c)
+Crawler implementation: [crawler.cpp](./problem-5/crawler.cpp)
+
+Benchmark results for different workers number: [results.txt](./problem-5/results.txt)
