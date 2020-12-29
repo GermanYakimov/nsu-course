@@ -1,6 +1,6 @@
-# Problem 1
-Theme: basic C concepts: data types, arrays and loops
+# Problem 4
+Theme: C-based AVL trees
 
-Task: [task.pdf](./task.pdf)
+Task: -
 
-Solution: [source.c](./problem-1/source.c)
+AVL tree logic: [AVL_tree.c](./problem-4/AVL_tree.c)
