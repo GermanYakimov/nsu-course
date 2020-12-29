@@ -1,6 +1,6 @@
 # Problem 1
-Theme: basic C concepts: data types, arrays and loops
+Theme: basic C++ OOP concepts - encapsulation, constructors and overloading
 
 Task: [task.pdf](./task.pdf)
 
-Solution: [source.c](./problem-1/source.c)
+Matrix logic: [matrix.cpp](./problem-1/matrix.cpp)
