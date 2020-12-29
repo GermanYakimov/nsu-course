@@ -1,5 +1,5 @@
 # Problem 1
-Theme: basic C concepts: data types, arrays and loops
+Theme: basic C concepts - data types, arrays and loops
 
 Task: [task.pdf](./task.pdf)
 
