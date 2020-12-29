@@ -1,7 +1,7 @@
 # Problem 4
 Theme: STD/STL practice - deterministic finite automaton implementation
 
-Extra: add DFA for regexp building
+Extra: DFA for regexp building
 
 Task: [task.pdf](./task.pdf)
 
