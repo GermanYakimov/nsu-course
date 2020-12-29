@@ -1,4 +1,4 @@
-# Problem 1
+# Problem 3
 Theme: basic C concepts - pointers (algorithms benchmark system for matrices sorts)
 Extra: Gaussian elemination for determinant and standard deviations calculating
 
