@@ -1,6 +1,6 @@
-# Problem 1
-Theme: basic C concepts: data types, arrays and loops
+# Problem 2
+Theme: basic C concepts - null-terminated strings
 
 Task: [task.pdf](./task.pdf)
 
-Solution: [source.c](./problem-1/source.c)
+Solution: [source_final.c](./problem-2/source_final.c)
