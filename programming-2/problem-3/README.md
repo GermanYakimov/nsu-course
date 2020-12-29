@@ -1,6 +1,10 @@
-# Problem 1
-Theme: basic C concepts: data types, arrays and loops
+# Problem 3
+Theme: basic C++ concepts - templates (hashmap implementation)
 
 Task: [task.pdf](./task.pdf)
 
-Solution: [source.c](./problem-1/source.c)
+BaseHashMap: [BaseHashMap.h](./problem-3/BaseHashMap.h)
+
+HashMap: [HashMap.h](./problem-3/HashMap.h)
+
+MultiHashMap: [MultiHashMap.h](./problem-3/MultiHashMap.h)
