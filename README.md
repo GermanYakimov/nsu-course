@@ -9,7 +9,7 @@ There are two courses: programming-1 (2d term, C) and programming-2 (3d term, C+
   <li> <a href="programming-1/problem-2/"> Problem 2 </a> (strings in C: basic regexps) </li>
   <li> <a href="programming-1/problem-3/"> Problem 3 </a> (algorithms benchmark system on the example of sorting matrices by determinant) </li>
   <li> <a href="programming-1/problem-4/"> Problem 4 </a> (C-based AVL tree) </li>
-  <li> <a href="programming-1/problem-5/"> Problem 5 </a> (Dijkstra algorithm) </li>
+  <li> <a href="programming-1/problem-5/"> Problem 5 </a> (Dijkstra algorithm based on binary heap) </li>
 </ul>
 
 <h3>C++ programming tasks:</h3>
